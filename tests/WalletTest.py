@@ -1,7 +1,7 @@
 import unittest
 
 from logic.Wallet import Wallet
-from logic.IncorrectBuyAmountError import IncorrectBuyAmountError
+from logic.exceptions.IncorrectBuyAmountError import IncorrectBuyAmountError
 
 
 class MyTestCase(unittest.TestCase):
@@ -20,10 +20,10 @@ class MyTestCase(unittest.TestCase):
 
     # ajouter le mock du service
     # d u coup faudra créer un service
-    def test_buy_should_add_stock_in_wallet_stocks(self):
-        self.Wallet.set_wallet_amount(1000)
-        self.Wallet.buy("AAPL", 100)
-        self.assertEqual()
+    # def test_buy_should_add_stock_in_wallet_stocks(self):
+    #     self.Wallet.set_wallet_amount(1000)
+    #     self.Wallet.buy("AAPL", 100)
+    #     self.assertEqual()
 
 
 if __name__ == '__main__':

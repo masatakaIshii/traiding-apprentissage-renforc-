@@ -1,0 +1,2 @@
+class IncorrectBuyAmountError(Exception):
+    pass

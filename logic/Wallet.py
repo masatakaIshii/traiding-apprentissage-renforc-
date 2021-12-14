@@ -1,7 +1,8 @@
 # Récupérer les infos entre deux dates
 # Sauvegarder le paquetol
 # Faire les calculs au moment de l'achat / vente etc
-from logic.IncorrectBuyAmountError import IncorrectBuyAmountError
+from logic.FinanceService import FinanceService
+from logic.exceptions.IncorrectBuyAmountError import IncorrectBuyAmountError
 
 
 class Wallet:
