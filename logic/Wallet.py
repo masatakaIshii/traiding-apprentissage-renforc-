@@ -24,5 +24,13 @@ class Wallet:
     def stocks(self):
         return self.__stocks
 
-    def set_wallet_amount(self, amount):
-        self.__wallet_amount = amount
+    @wallet_amount.setter
+    def wallet_amount(self, value):
+        self.__wallet_amount = value
+
+    def reset_mock(self):
+        pass
+
+    @stocks.setter
+    def stocks(self, value):
+        self._stocks = value
