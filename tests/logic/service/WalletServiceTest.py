@@ -1,24 +1,24 @@
 import unittest
 from datetime import date
-from unittest.mock import MagicMock, PropertyMock
+from unittest.mock import MagicMock
 
 from logic.Stock import Stock
 from logic.Wallet import Wallet
 from logic.exceptions.IncorrectBuyAmountError import IncorrectBuyAmountError
+from logic.exceptions.StockNotFoundError import StockNotFoundError
 from logic.service.WalletService import WalletService
 
 
 class WalletServiceTest(unittest.TestCase):
     def setUp(self) -> None:
         self.mock_finance_service = MagicMock()
-        self.mock_wallet = Wallet()
-        self.wallet_service = WalletService(self.mock_wallet, self.mock_finance_service)
+        self.wallet = Wallet()
+        self.wallet_service = WalletService(self.wallet, self.mock_finance_service)
 
     # get_amount
     def test_get_amount_should_return_amount_of_wallet(self):
         wallet_amount = 33
-        mock_wallet_amount = PropertyMock(return_value=wallet_amount)
-        type(self.mock_wallet).wallet_amount = mock_wallet_amount
+        self.wallet.wallet_amount = wallet_amount
 
         self.assertEqual(wallet_amount, self.wallet_service.get_amount())
 
@@ -28,11 +28,11 @@ class WalletServiceTest(unittest.TestCase):
         purchase_value = 36
         share_percentage = 50
         self.mock_finance_service.get_stock.return_value = Stock(today_str, purchase_value, share_percentage)
-        wallet_amount = self.mock_wallet.wallet_amount
+        wallet_amount = self.wallet.wallet_amount
         self.assertEqual(100, wallet_amount)
         self.wallet_service.buy_stock(today_str, share_percentage)
 
-        self.assertEqual(100 - 36 * 0.5, self.wallet_service.get_amount())
+        self.assertEqual(50, self.wallet.wallet_amount)
 
     def test_buy_stock_after_bought_stock_should_add_in_wallet(self):
         today = date.today().strftime('%m-%d-%Y')
@@ -40,11 +40,11 @@ class WalletServiceTest(unittest.TestCase):
         share_percentage = 50
         self.mock_finance_service.get_stock.return_value = Stock(today, purchase_value, share_percentage)
 
-        len_stock = len(self.mock_wallet.stocks)
+        len_stock = len(self.wallet.stocks)
 
         self.wallet_service.buy_stock(today, share_percentage)
 
-        self.assertEqual(len_stock + 1, len(self.mock_wallet.stocks))
+        self.assertEqual(len_stock + 1, len(self.wallet.stocks))
 
     def test_buy_stock_after_add_bought_stock_should_return_bought_stock(self):
         today = date.today().strftime('%m-%d-%Y')
@@ -69,33 +69,20 @@ class WalletServiceTest(unittest.TestCase):
 
     # get_stocks
     def test_get_stocks_should_return_all_stocks_on_wallet(self):
-        stocks = [
+        self.wallet.stocks = stocks = [
             Stock("20-10-2020", 5, 4)
         ]
-        type(self.mock_wallet).stocks = PropertyMock(return_value=stocks)
 
         result = self.wallet_service.get_stocks()
 
         self.assertEqual(result, stocks)
 
     # get_stock
-    def test_get_stock_should_get_stocks_of_wallet(self):
-        stocks = [
-            Stock("20-10-2020", 5, 4)
-        ]
-        mock_stocks = PropertyMock(return_value=stocks)
-        type(self.mock_wallet).stocks = mock_stocks
-
-        self.wallet_service.get_stock(0)
-        mock_stocks.assert_called_once()
-
     def test_get_stock_should_get_one_stock_based_on_stocks_by_index(self):
         expect_stock = Stock("20-10-2020", 5, 4)
-        stocks = [
+        self.wallet.stocks = [
             expect_stock
         ]
-        mock_stocks = PropertyMock(return_value=stocks)
-        type(self.mock_wallet).stocks = mock_stocks
 
         result = self.wallet_service.get_stock(0)
 
@@ -106,8 +93,7 @@ class WalletServiceTest(unittest.TestCase):
         stocks = [
             expect_stock
         ]
-        mock_stocks = PropertyMock(return_value=stocks)
-        type(self.mock_wallet).stocks = mock_stocks
+        self.wallet.stocks = stocks
 
         cur_index = 1
 
@@ -116,18 +102,65 @@ class WalletServiceTest(unittest.TestCase):
         self.assertEqual(len(stocks), cur_index)
         self.assertIsNone(result)
 
-    def test_sell_stock_should_get_stocks_of_wallet(self):
+    def test_sell_stock_and_return_profit_when_finance_service_return_none_should_raise_exception(self):
         expect_stock = Stock("20-10-2020", 5, 4)
-        stocks = [
+        type(self.wallet).stocks = [
             expect_stock
         ]
-        mock_stocks = PropertyMock(return_value=stocks)
-        type(self.mock_wallet).stocks = mock_stocks
+        today = date.today().strftime('%m-%d-%Y')
+        self.mock_finance_service.get_value_by_date.return_value = None
 
-        self.wallet_service.sell_stock(0)
+        with self.assertRaises(StockNotFoundError):
+            self.wallet_service.sell_stock_and_return_profit(0, today)
 
-        mock_stocks.assert_called()
+    def test_sell_stock_and_return_profit_when_got_value_by_current_date_of_finance_service_should_add_wallet_amount(
+            self):
+        expect_stock = Stock(
+            purchase_date="20-10-2020",
+            purchase_value=100,
+            share_percentage=50)
+        self.wallet.stocks = [
+            expect_stock
+        ]
+        before_sell_wallet_amount = self.wallet.wallet_amount
+        self.mock_finance_service.get_value_by_date.return_value = 100
 
-    def test_sell_stock_oscours_jenecomprendpascequejefais(self):
-        self.assertNotEqual("En espérant demain ça va se résoudre",
-                            "désolé pour ce test, bon j'ai vu aussi pire l'année dernière mais je ne dénonce pas")
+        self.wallet_service.sell_stock_and_return_profit(0)
+
+        expect_wallet_amount = before_sell_wallet_amount + 100 * 50 / 100
+        self.assertEqual(self.wallet.wallet_amount, expect_wallet_amount)
+
+    def test_sell_stock_and_return_profit_when_profit_more_than_0_should_reduce_wallet_amount_minus_30_percent_of_profit(
+            self):
+        expect_stock = Stock(
+            purchase_date="20-10-2020",
+            purchase_value=100,
+            share_percentage=50)
+        self.wallet.stocks = [
+            expect_stock
+        ]
+        before_sell_wallet_amount = self.wallet.wallet_amount
+        self.mock_finance_service.get_value_by_date.return_value = 200
+
+        self.wallet_service.sell_stock_and_return_profit(0)
+
+        expect_wallet_amount = before_sell_wallet_amount + 200 * expect_stock.share_percentage / 100
+        profit = 200 * expect_stock.share_percentage / 100 - expect_stock.purchase_value * expect_stock.share_percentage / 100
+
+        self.assertEqual(self.wallet.wallet_amount, expect_wallet_amount - profit * 0.3)
+
+    def test_sell_stock_and_return_profit_should_return_profit(self):
+        expect_stock = Stock(
+            purchase_date="20-10-2020",
+            purchase_value=100,
+            share_percentage=50)
+        self.wallet.stocks = [
+            expect_stock
+        ]
+        self.mock_finance_service.get_value_by_date.return_value = 200
+
+        result = self.wallet_service.sell_stock_and_return_profit(0)
+
+        expect_profit = (200 - 100) * 50 / 100 * 0.7
+
+        self.assertEqual(result, expect_profit)
