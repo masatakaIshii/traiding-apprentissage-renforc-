@@ -1,6 +1,9 @@
+import datetime
+
+
 class Stock:
-    def __init__(self, purchase_date,
-                 purchase_value, share_percentage):
+    def __init__(self, purchase_date: datetime,
+                 purchase_value: float, share_percentage: float):
         self.__purchase_value = purchase_value
         self.__purchase_date = purchase_date
         self.__share_percentage = share_percentage
