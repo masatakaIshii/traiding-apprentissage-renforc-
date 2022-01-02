@@ -1,8 +1,10 @@
+from datetime import timedelta
 from typing import Optional
 
 import pandas as pd
 from logic.Stock import Stock
 import yfinance as yf
+from datetime import datetime
 
 
 class FinanceService:
@@ -27,6 +29,10 @@ class FinanceService:
     def get_value_by_date(self, date: str) -> Optional[float]:
         return self.__stock_history.loc[date]['Close']
 
-    # TODO : for Jerem and use TDD mandatory
-    def get_interval_one_stock_history(self, start_date, end_date):
-        pass
+    def get_interval_one_stock_history(self, start_date, days):
+        try:
+            start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date = start_date_datetime + timedelta(days=days)
+            return self.__stock_history.loc[start_date:end_date]['Close']
+        except:
+            return None

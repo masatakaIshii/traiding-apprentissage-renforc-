@@ -13,11 +13,17 @@ import mplfinance as mpf
 # # + other methods etc.
 from logic.FinanceService import FinanceService
 
-financeService = FinanceService()
-financeService.load_history("AAPL", "2018-02-15", "2020-02-15")
+
 
 if __name__ == '__main__':
-    print(financeService.get_stock("2019-02-15", 20))
+    financeService = FinanceService()
+    financeService.load_history("AAPL", "2018-02-15", "2020-02-15")
+    #print(financeService.get_stock("2019-02-15", 20))
+    print(financeService.get_interval_one_stock_history("2019-02-15", 33))
+
+
+
+
     #print(financeService.stock_history.loc["2018-02-15"]['Close'])
     #print(financeService.stock_history.loc["2018-02-15"])
 # print(hist.index[0])
