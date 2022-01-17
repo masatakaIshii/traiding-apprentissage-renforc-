@@ -11,30 +11,38 @@ import mplfinance as mpf
 # hist = msft.history(interval="1d", start="2019-10-15", end="2021-10-15")
 # # df = pd.DataFrame(hist)
 # # + other methods etc.
+from bot.Agent import Agent
+from bot.State import State
 from logic.FinanceService import FinanceService
-
-
+from logic.Wallet import Wallet
+from logic.service.WalletService import WalletService
 
 if __name__ == '__main__':
-    financeService = FinanceService()
-    financeService.load_history("AAPL", "2018-02-15", "2020-02-15")
-    #print(financeService.get_stock("2019-02-15", 20))
-    print(financeService.get_interval_one_stock_history("2019-02-15", 33))
+    wallet = Wallet()
+    finance_service = FinanceService()
+    finance_service.load_history("AAPL", "2018-01-01", "2018-01-23")
+    wallet_service = WalletService(wallet, finance_service)
+    # TODO je sais pas quoi faire avec ce goal, comment on peut le définir ?
+    # Si on met HIGH on ira jamais à Very High 😢
+    goal = State.HIGH
+    agent = Agent(wallet_service)
 
-
-
-
-    #print(financeService.stock_history.loc["2018-02-15"]['Close'])
-    #print(financeService.stock_history.loc["2018-02-15"])
-# print(hist.index[0])
-# print(hist.loc["2019-10-15"])
-
-
-# print(df)
-# hist.where()['Open', 'High', 'Low', 'Close', 'Volume', 'Dividends', 'Stock Splits']
-# print(hist.get('Close'))
-#
-# mpf.plot(hist, type="candle", volume=True, figratio=(
-#     15, 7), style='yahoo', mav=(6, 15), title='spy candle charts')
-# # for x in hist.get('Close'):
-# #     print(x)
+    ##while agent.state != goal:
+    for i in range(8):
+        print("")
+        print(f"GRAND TOUR {i + 1}")
+        agent.reset()
+        count = 1
+        for date, stock in finance_service.stock_history.iterrows():
+            print("")
+            print(f"TOUR {count}")
+            print(f"DATE : {date} STOCK : {stock['Close']}")
+            agent.current_date = date
+            action = agent.best_action()
+            print(f"BEST ACTION : {action}")
+            agent.do_action(action)
+            agent.update(action)
+            print(f"STATE : {agent.state}")
+            print(f"SCORE : {agent.score}")
+            count += 1
+        print(agent.qtable)
