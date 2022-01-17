@@ -22,13 +22,12 @@ if __name__ == '__main__':
     finance_service = FinanceService()
     finance_service.load_history("AAPL", "2018-01-01", "2018-01-23")
     wallet_service = WalletService(wallet, finance_service)
-    # TODO je sais pas quoi faire avec ce goal, comment on peut le définir ?
-    # Si on met HIGH on ira jamais à Very High 😢
-    goal = State.HIGH
+    # TODO je sais pas trop quoi faire avec le goal
+    goal = State.VERY_HIGH
     agent = Agent(wallet_service)
 
     ##while agent.state != goal:
-    for i in range(8):
+    for i in range(100):
         print("")
         print(f"GRAND TOUR {i + 1}")
         agent.reset()

@@ -6,6 +6,7 @@
 # - update avec les rewards
 # - les rewards du coup lol
 from bot.Action import Action
+from bot.Reward import Reward
 from bot.State import State
 from logic.service.WalletService import WalletService
 
@@ -81,21 +82,40 @@ class Agent:
     # TODO A DEBATTRE POUR LE CACLUL DE LA REWARD
     # Prendre le pourcentage d'argent gagné sur la dernière action
     # Donc il nous faut tout le temps l'argent actuel et celui de juste avant
-    def calculate_reward(self) -> float:
-        last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage()
-        print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
-        reward = last_action_profit_percentage ** 2
-        return reward if last_action_profit_percentage > 0 else reward * -1
+    def calculate_reward(self, state: State) -> float:
+        match state:
+            case State.VERY_LOW:
+                return Reward.VERY_LOW.value
+            case State.LOW:
+                return Reward.LOW.value
+            case State.LITTLE_LOW:
+                return Reward.LITTLE_LOW.value
+            case State.LITTLE_HIGH:
+                return Reward.LITTLE_HIGH.value
+            case State.HIGH:
+                return Reward.HIGH.value
+            case State.VERY_HIGH:
+                return Reward.VERY_HIGH.value
+            case _:
+                return 0
 
+    # Avec catégorie précédente
     # def calculate_reward(self, old_state: State, new_state: State) -> float:
     #     state_value = new_state.value - old_state.value
     #     reward = state_value ** 2 * 100
     #     return reward if state_value > 0 else reward * -1
 
+    # Avec argent précédent
+    # def calculate_reward(self) -> float:
+    #     last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage()
+    #     print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
+    #     reward = last_action_profit_percentage ** 2
+    #     return reward if last_action_profit_percentage > 0 else reward * -1
+
     def update(self, action: Action):
         new_state = self.define_state()
         print(f"NOUVEL ETAT {new_state}")
-        reward = self.calculate_reward()
+        reward = self.calculate_reward(new_state)
         print(f"REWARD : {reward}")
         qtable_current_date = self.__qtable[self.__current_date]
 
@@ -109,7 +129,7 @@ class Agent:
 
     def can_perform_action(self, action: Action) -> bool:
         match action:
-            case Action.BUY: # TODO Refacto pour les montants
+            case Action.BUY:  # TODO Refacto pour les montants
                 return self.__wallet_service.can_buy_stock(50)
             case Action.SELL:
                 return self.__wallet_service.can_sell_stock()
