@@ -32,10 +32,10 @@ class Agent:
     def init_qtable(self):
         for day, row in self.__wallet_service.finance_service.stock_history.iterrows():
             self.__qtable[day] = {}
-            for state in self.__states:
-                self.__qtable[day][state] = {}
-                for action in self.__actions:
-                    self.__qtable[day][state][action] = 0.0
+            # for state in self.__states:
+            #     self.__qtable[day][state] = {}
+            for action in self.__actions:
+                self.__qtable[day][action] = 0.0
 
     @property
     def current_date(self):
@@ -57,7 +57,12 @@ class Agent:
     def qtable(self):
         return self.__qtable
 
+    def get_current_money_amount(self):
+        return self.__wallet_service.get_amount()
+
+    # Remet tout à zéro lol
     def reset(self):
+        self.__wallet_service.reset()
         self.__state = State.LITTLE_HIGH
         self.__score = 0
 
@@ -65,16 +70,16 @@ class Agent:
     # Nan il faut update le state à chaque fois, donc faut savoir en permanence combien on perd / gagne virtuellement
     def define_state(self) -> State:
         profit_percentage = self.__wallet_service.get_profit_percentage()
-        print(f"PROFIT POURCENTAGE : {profit_percentage}")
-        if 0 > profit_percentage > -10:
+        print(f"PROFIT PERCENTAGE {profit_percentage}")
+        if 0 > profit_percentage >= -10:
             return State.LITTLE_LOW
-        elif -10 > profit_percentage > -30:
+        elif -10 > profit_percentage >= -30:
             return State.LOW
         elif profit_percentage < -30:
             return State.VERY_LOW
-        elif 0 < profit_percentage < 10:
+        elif 0 <= profit_percentage <= 10:
             return State.LITTLE_HIGH
-        elif 10 < profit_percentage < 30:
+        elif 10 < profit_percentage <= 30:
             return State.HIGH
         else:
             return State.VERY_HIGH
@@ -106,7 +111,7 @@ class Agent:
     #     return reward if state_value > 0 else reward * -1
 
     # Avec argent précédent
-    # def calculate_reward(self) -> float:
+    # def calculate_reward_when_buying_or_selling(self) -> float:
     #     last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage()
     #     print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
     #     reward = last_action_profit_percentage ** 2
@@ -119,11 +124,11 @@ class Agent:
         print(f"REWARD : {reward}")
         qtable_current_date = self.__qtable[self.__current_date]
 
-        maxQ = max(qtable_current_date[new_state].values())
-        qtable_current_date[self.__state][action] += self.__learning_rate * \
-                                                     (reward + self.__discount_factor * maxQ -
-                                                      qtable_current_date[self.__state][
-                                                          action])
+        maxQ = max(qtable_current_date.values())
+        qtable_current_date[action] += self.__learning_rate * \
+                                       (reward + self.__discount_factor * maxQ -
+                                        qtable_current_date[
+                                            action])
         self.__state = new_state
         self.__score += reward
 
@@ -140,12 +145,12 @@ class Agent:
         best = None
         qtable_current_date = self.__qtable[self.__current_date]
 
-        for action in qtable_current_date[self.__state]:  # par défaut c'est buy...
+        for action in qtable_current_date:  # par défaut c'est buy...
             print(f"BEST : {best}")
             print(f"Action : {action} Can perform : {self.can_perform_action(action)}")
             if self.can_perform_action(action):
                 if not best \
-                        or qtable_current_date[self.__state][action] > qtable_current_date[self.__state][best]:
+                        or qtable_current_date[action] > qtable_current_date[best]:
                     best = action
         return best
 

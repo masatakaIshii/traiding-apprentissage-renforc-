@@ -20,14 +20,21 @@ from logic.service.WalletService import WalletService
 if __name__ == '__main__':
     wallet = Wallet()
     finance_service = FinanceService()
-    finance_service.load_history("AAPL", "2018-01-01", "2018-01-23")
+    finance_service.load_history("AAPL", "2018-01-01", "2018-01-10")
+
+    for date, stock in finance_service.stock_history.iterrows():
+        print(f"DATE : {date} VALUE : {stock['Close']}")
+
+
+
     wallet_service = WalletService(wallet, finance_service)
     # TODO je sais pas trop quoi faire avec le goal
     goal = State.VERY_HIGH
     agent = Agent(wallet_service)
-
+    max = 100
+    boucle = 1
     ##while agent.state != goal:
-    for i in range(100):
+    for i in range(6):
         print("")
         print(f"GRAND TOUR {i + 1}")
         agent.reset()
@@ -45,3 +52,8 @@ if __name__ == '__main__':
             print(f"SCORE : {agent.score}")
             count += 1
         print(agent.qtable)
+        if agent.get_current_money_amount() > max:
+            max = agent.get_current_money_amount()
+            boucle = i + 1
+
+    print(f"MAX ARGENT : {max} à la boucle {boucle}")

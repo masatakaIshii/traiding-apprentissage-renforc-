@@ -42,7 +42,7 @@ class WalletService:
 
     def sell_stock_and_return_profit(self, index: int, cur_date_str=date.today().strftime('%m-%d-%Y')):
         stocks = self.__wallet.stocks
-        stock_to_sell: Stock = stocks[index]
+        stock_to_sell: Stock = stocks.pop(index)
 
         cur_value = self.__finance_service.get_value_by_date(cur_date_str)
         if cur_value is None:
@@ -77,13 +77,19 @@ class WalletService:
         return self.__wallet.wallet_amount > amount
 
     def can_sell_stock(self) -> bool:
+        print(f"LEN STOCKS {len(self.__wallet.stocks)}")
         return len(self.__wallet.stocks) > 0
 
     def get_last_action_profit_percentage(self) -> float:
         # au lieu d'initial value on veut value - 1
+        print(f"LAST WALLET AMOUNT {self.__wallet.last_wallet_amount}")
+        print(f"WALLET AMOUNT {self.__wallet.wallet_amount}")
         if self.__wallet.wallet_amount == self.__wallet.last_wallet_amount:
             return 0
         return (self.__wallet.wallet_amount - self.__wallet.last_wallet_amount) / self.__wallet.last_wallet_amount * 100
 
     def keep_stock(self):
         self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
+
+    def reset(self):
+        self.__wallet = Wallet()
