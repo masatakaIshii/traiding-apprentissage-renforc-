@@ -58,8 +58,10 @@ class Agent:
         self.__score = 0
 
     def calculate_reward(self) -> float:
-        last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage()
+        last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
         print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
+        if last_action_profit_percentage == 0:
+            last_action_profit_percentage = -10
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
@@ -75,6 +77,8 @@ class Agent:
                                                       qtable_current_date[self.__state][
                                                           action])
         self.__score += reward
+        self.__wallet_service.update_last_amount(self.__current_date)
+        # TODO Update le last amount ici
 
     def can_perform_action(self, action: Action) -> bool:
         match action:
@@ -107,6 +111,6 @@ class Agent:
             case Action.SELL:
                 # TODO je ne vois pas comment faire avec plusieurs stocks pour l'instant
                 self.__wallet_service.sell_stock_and_return_profit(0, self.__current_date)
-            case Action.KEEP:
-                self.__wallet_service.keep_stock()
+            # case Action.KEEP:
+            #     self.__wallet_service.keep_stock()
         print(f"ARGENT ACTUEL {self.__wallet_service.get_amount()}")

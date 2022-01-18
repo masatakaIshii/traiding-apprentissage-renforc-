@@ -1,10 +1,20 @@
+import json
+
 import yfinance as yf
 import pandas as pd
 import mplfinance as mpf
 
+
 # msft = yf.Ticker("MSFT")
 #
 # # get stock info
+def pretty(d, indent=0):
+    for key, value in d.items():
+        print('\t' * indent + str(key))
+        if isinstance(value, dict):
+            pretty(value, indent + 1)
+        else:
+            print('\t' * (indent + 1) + str(value))
 
 
 # get historical market data
@@ -20,7 +30,7 @@ from logic.service.WalletService import WalletService
 if __name__ == '__main__':
     wallet = Wallet()
     finance_service = FinanceService()
-    finance_service.load_history("AAPL", "2018-01-01", "2018-01-23")
+    finance_service.load_history("AAPL", "2018-01-01", "2018-01-10")
 
     for date, stock in finance_service.stock_history.iterrows():
         print(f"DATE : {date} VALUE : {stock['Close']}")
@@ -29,10 +39,10 @@ if __name__ == '__main__':
     # TODO je sais pas trop quoi faire avec le goal
     goal = State.VERY_HIGH
     agent = Agent(wallet_service)
-    max = 100
+    max = -10000
     boucle = 1
     ##while agent.state != goal:
-    for i in range(50):
+    for i in range(1000):
         print("")
         print(f"GRAND TOUR {i + 1}")
         agent.reset()
@@ -49,9 +59,11 @@ if __name__ == '__main__':
             print(f"STATE : {agent.state}")
             print(f"SCORE : {agent.score}")
             count += 1
-        print(agent.qtable)
-        if agent.get_current_money_amount() > max:
-            max = agent.get_current_money_amount()
+
+        if agent.score > max:
+            max = agent.score
             boucle = i + 1
 
-    print(f"MAX ARGENT : {max} à la boucle {boucle}")
+    print(f"MAX SCORE : {max} à la boucle {boucle}")
+
+    print(pretty(agent.qtable))

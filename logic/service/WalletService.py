@@ -20,12 +20,9 @@ class WalletService:
     def buy_stock(self, cur_date_str: str, amount: float) -> Stock:
         stock_to_buy = self.__finance_service.get_stock(cur_date_str, amount)
 
-        # TODO pourquoi multiplier par le share percentage ? on achète que le montant, le pourcentage est calculé après
-        # stock_total_cost = stock_to_buy.purchase_value * (stock_to_buy.share_percentage / 100)
-
         if self.__wallet.wallet_amount - amount <= 0:
             raise IncorrectBuyAmountError
-        self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
+        # self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
         self.__wallet.wallet_amount -= amount
         self.__wallet.stocks.append(stock_to_buy)
 
@@ -47,12 +44,12 @@ class WalletService:
         cur_value = self.__finance_service.get_value_by_date(cur_date_str)
         if cur_value is None:
             raise StockNotFoundError
-        # TODO chui pas certain là...
+
         cur_amount_value = cur_value * stock_to_sell.share_percentage / 100
         stock_to_sell_amount_value = stock_to_sell.purchase_value * stock_to_sell.share_percentage / 100
         profit: float = cur_amount_value - stock_to_sell_amount_value
 
-        self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
+        # self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
         self.__wallet.wallet_amount = self.__wallet.wallet_amount + cur_amount_value
 
         if profit > 0:
@@ -79,16 +76,24 @@ class WalletService:
     def can_sell_stock(self) -> bool:
         return len(self.__wallet.stocks) > 0
 
-    def get_last_action_profit_percentage(self) -> float:
-        # au lieu d'initial value on veut value - 1
-        # print(f"LAST WALLET AMOUNT {self.__wallet.last_wallet_amount}")
-        # print(f"WALLET AMOUNT {self.__wallet.wallet_amount}")
-        if self.__wallet.wallet_amount == self.__wallet.last_wallet_amount:
-            return 0
-        return (self.__wallet.wallet_amount - self.__wallet.last_wallet_amount) / self.__wallet.last_wallet_amount * 100
+    def get_potentiel_total_amount(self, current_date: str) -> float:
+        percentage_stock_possess = sum(stock.share_percentage for stock in self.__wallet.stocks)
 
-    def keep_stock(self):
-        self.__wallet.last_wallet_amount = self.__wallet.wallet_amount
+        current_stock_value = self.__finance_service.get_value_by_date(current_date)
+        return self.__wallet.wallet_amount + (percentage_stock_possess / 100 * current_stock_value)
+
+    def get_last_action_profit_percentage(self, current_date: str) -> float:
+        total_virtual_value = self.get_potentiel_total_amount(current_date)
+        print(f"TOTAL VIRTUAL VALUE {total_virtual_value}")
+        if total_virtual_value == self.__wallet.last_wallet_amount:
+            return 0
+        return (total_virtual_value - self.__wallet.last_wallet_amount) / self.__wallet.last_wallet_amount * 100
+
+    # def keep_stock(self, current_date: str):
+    #     self.__wallet.last_wallet_amount = self.get_potentiel_total_amount(current_date)
 
     def reset(self):
         self.__wallet = Wallet()
+
+    def update_last_amount(self, current_date: str):
+        self.__wallet.last_wallet_amount = self.get_potentiel_total_amount(current_date)

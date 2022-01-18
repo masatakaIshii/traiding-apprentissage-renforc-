@@ -24,7 +24,7 @@ class FinanceService:
     def get_stock(self, date: str, amount: float):
         stock_value = self.__stock_history.loc[date]['Close']
         if stock_value > 0:
-            return Stock(date, amount, round(100 * amount / stock_value, 2))
+            return Stock(date, amount, 100 * amount / stock_value)
         return Stock()
 
     def get_average_value(self) -> float:
