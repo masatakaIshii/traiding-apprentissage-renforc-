@@ -1,0 +1,38 @@
+<Demo>:
+    # BoxLayout:
+    #     id: box
+    #     size_hint_y: .8
+    #     pos_hint: {"top":1}
+
+    # BoxLayout:
+    is_paused_label:is_paused_label
+    timer_label:timer_label
+
+    GridLayout:
+        cols:1
+        size: root.width, root.height
+
+        GridLayout:
+            cols:2
+
+            Label:
+                text:'Timer'
+            Label:
+                id:timer_label
+                text:'0'
+            
+            Label:
+                text:'Is timer ?'
+            Label:
+                id:is_paused_label
+                text:'not paused'
+            
+            Label:
+                text:'Wallet'
+            Label:
+                id:wallet_label
+                text:'100'
+        Button:
+            text:'Pause'
+            on_press: root.press()
+        

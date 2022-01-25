@@ -1,4 +1,5 @@
 from datetime import timedelta
+from tokenize import String
 from typing import Optional
 
 import pandas as pd
@@ -10,6 +11,9 @@ from datetime import datetime
 
 
 class FinanceService:
+    start_date: str
+    end_date: str
+
     def __init__(self):
         self.__stock_history = pd.DataFrame()
         self.__states = [State.VERY_LOW, State.LOW, State.LITTLE_LOW, State.LITTLE_HIGH, State.HIGH, State.VERY_HIGH]
@@ -17,6 +21,9 @@ class FinanceService:
 
     # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
+        self.start_date = start_date
+        
+        self.end_date = end_date
         ticker = yf.Ticker(stock_name)
         self.__stock_history = ticker.history(interval="1d", start=start_date, end=end_date)
         self.__average_value = self.get_average_value()
@@ -71,6 +78,6 @@ class FinanceService:
         try:
             start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_date = start_date_datetime + timedelta(days=days)
-            return self.__stock_history.loc[start_date:end_date]['Close']
+            return self.__stock_history.loc[start_date:end_date]
         except:
             return None
