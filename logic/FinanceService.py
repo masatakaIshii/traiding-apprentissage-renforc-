@@ -67,6 +67,9 @@ class FinanceService:
     def stock_history(self):
         return self.__stock_history
 
+    def set_stock_history(self, new_stock_history):
+        self.__stock_history = new_stock_history
+
     @property
     def states(self):
         return self.__states
