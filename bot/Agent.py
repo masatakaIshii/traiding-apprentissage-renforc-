@@ -6,7 +6,6 @@
 # - update avec les rewards
 # - les rewards du coup lol
 from bot.Action import Action
-from bot.State import State
 from logic.service.WalletService import WalletService
 
 
@@ -17,17 +16,22 @@ class Agent:
         self.__learning_rate = learning_rate
         self.__discount_factor = discount_factor
         self.__qtable = {}
-        self.__state = State.LITTLE_LOW
         self.init_qtable()
         self.reset()
 
     def init_qtable(self):
-        for day, row in self.__wallet_service.finance_service.stock_history.iterrows():
-            self.__qtable[day] = {}
-            for state in self.__wallet_service.finance_service.states:
-                self.__qtable[day][state] = {}
-                for action in self.__actions:
-                    self.__qtable[day][state][action] = 0.0
+        for state in range(self.__wallet_service.finance_service.category_number):
+            self.__qtable[state] = {}
+            for stock_state in [False, True]:
+                self.__qtable[state][stock_state] = {}
+                if not stock_state:
+                    for action in self.__actions:
+                        self.__qtable[state][stock_state][action] = 0.0
+                else:
+                    for bought_stock_state in range(self.__wallet_service.finance_service.category_number):
+                        self.__qtable[state][stock_state][bought_stock_state] = {}
+                        for action in self.__actions:
+                            self.__qtable[state][stock_state][bought_stock_state][action] = 0.0
 
     @property
     def current_date(self):
@@ -60,8 +64,8 @@ class Agent:
     def calculate_reward(self) -> float:
         last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
         print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
-        if last_action_profit_percentage == 0:
-            last_action_profit_percentage = -10
+        # if last_action_profit_percentage == 0:
+        #     last_action_profit_percentage = -10
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
@@ -69,13 +73,24 @@ class Agent:
         print(f"NOUVEL ETAT {self.__state}")
         reward = self.calculate_reward()
         print(f"REWARD : {reward}")
-        qtable_current_date = self.__qtable[self.__current_date]
+        # TODO faut d'abord voir si on a bought du coup
+        has_bought = self.__wallet_service.has_bought()
+        if not has_bought:
+            maxQ = max(self.__qtable[self.__state][False].values())
+            self.__qtable[self.__state][False][action] += self.__learning_rate * \
+                                                          (reward + self.__discount_factor * maxQ -
+                                                           self.__qtable[self.__state][False][
+                                                               action])
+        else:
+            bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
+                self.__wallet_service.get_stock(0).purchase_date)
+            maxQ = max(self.__qtable[self.__state][True][bought_stock_state].values())
 
-        maxQ = max(qtable_current_date[self.__state].values())
-        qtable_current_date[self.__state][action] += self.__learning_rate * \
-                                                     (reward + self.__discount_factor * maxQ -
-                                                      qtable_current_date[self.__state][
-                                                          action])
+            self.__qtable[self.__state][True][bought_stock_state][action] += self.__learning_rate * \
+                                                                             (reward + self.__discount_factor * maxQ -
+                                                                              self.__qtable[self.__state][True][
+                                                                                  bought_stock_state][
+                                                                                  action])
         self.__score += reward
         self.__wallet_service.update_last_amount(self.__current_date)
         # TODO Update le last amount ici
@@ -85,22 +100,30 @@ class Agent:
             case Action.BUY:  # TODO Refacto pour les montants
                 return self.__wallet_service.can_buy_stock(50)
             case Action.SELL:
-                return self.__wallet_service.can_sell_stock()
+                return self.__wallet_service.has_bought()
             case _:
                 return True
 
     def best_action(self):
         best = None
-        qtable_current_date = self.__qtable[self.__current_date]
         self.__state = self.__wallet_service.finance_service.get_state_by_date(self.__current_date)
+        qtable = self.__qtable[self.__state]
 
-        for action in qtable_current_date[self.__state]:  # par défaut c'est buy...
-            print(f"BEST : {best}")
-            print(f"Action : {action} Can perform : {self.can_perform_action(action)}")
-            if self.can_perform_action(action):
-                if not best \
-                        or qtable_current_date[self.__state][action] > qtable_current_date[self.__state][best]:
-                    best = action
+        if self.__wallet_service.has_bought():
+            bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
+                self.__wallet_service.get_stock(0).purchase_date)
+            for action in qtable[True][bought_stock_state]:
+                if self.can_perform_action(action):
+                    if not best \
+                            or qtable[True][bought_stock_state][action] > qtable[True][bought_stock_state][best]:
+                        best = action
+        else:
+
+            for action in qtable[False]:
+                if self.can_perform_action(action):
+                    if not best \
+                            or qtable[False][action] > qtable[False][best]:
+                        best = action
         return best
 
     def do_action(self, action: Action):

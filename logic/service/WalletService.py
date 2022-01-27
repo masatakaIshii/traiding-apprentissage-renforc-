@@ -73,7 +73,7 @@ class WalletService:
     def can_buy_stock(self, amount: float) -> bool:
         return self.__wallet.wallet_amount > amount
 
-    def can_sell_stock(self) -> bool:
+    def has_bought(self) -> bool:
         return len(self.__wallet.stocks) > 0
 
     def get_potentiel_total_amount(self, current_date: str) -> float:

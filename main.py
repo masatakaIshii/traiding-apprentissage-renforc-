@@ -1,13 +1,10 @@
-import json
+from datetime import datetime
+from bot.Agent import Agent
+from logic.FinanceService import FinanceService
+from logic.Wallet import Wallet
+from logic.service.WalletService import WalletService
 
-import yfinance as yf
-import pandas as pd
-import mplfinance as mpf
 
-
-# msft = yf.Ticker("MSFT")
-#
-# # get stock info
 def pretty(d, indent=0):
     for key, value in d.items():
         print('\t' * indent + str(key))
@@ -17,53 +14,58 @@ def pretty(d, indent=0):
             print('\t' * (indent + 1) + str(value))
 
 
-# get historical market data
-# hist = msft.history(interval="1d", start="2019-10-15", end="2021-10-15")
-# # df = pd.DataFrame(hist)
-# # + other methods etc.
-from bot.Agent import Agent
-from bot.State import State
-from logic.FinanceService import FinanceService
-from logic.Wallet import Wallet
-from logic.service.WalletService import WalletService
-
 if __name__ == '__main__':
     wallet = Wallet()
-    finance_service = FinanceService()
-    finance_service.load_history("AAPL", "2018-01-01", "2018-01-10")
-
-    for date, stock in finance_service.stock_history.iterrows():
-        print(f"DATE : {date} VALUE : {stock['Close']}")
-
+    finance_service = FinanceService(8)
+    start_date = "2019-01-01"
+    end_date = "2020-01-01"
+    finance_service.load_history("AAPL", start_date, end_date)
     wallet_service = WalletService(wallet, finance_service)
-    # TODO je sais pas trop quoi faire avec le goal
-    goal = State.VERY_HIGH
     agent = Agent(wallet_service)
-    max = -10000
-    boucle = 1
-    ##while agent.state != goal:
-    for i in range(1000):
-        print("")
-        print(f"GRAND TOUR {i + 1}")
-        agent.reset()
-        count = 1
-        for date, stock in finance_service.stock_history.iterrows():
-            print("")
-            print(f"TOUR {count}")
-            print(f"DATE : {date} STOCK : {stock['Close']}")
-            agent.current_date = date
+
+    interval = 14
+    finance_service.define_current_interval("2019-01-01",
+                                            interval)  # 14 premiers jours donc je peux faire calcul moyenne
+    agent.current_date = finance_service.current_interval.last_valid_index
+    while datetime.strptime(agent.current_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d'):
+
+        for i in range(interval):
+            agent.current_date = finance_service.next_date(agent.current_date)  # on est sur la date d'après
             action = agent.best_action()
             print(f"BEST ACTION : {action}")
             agent.do_action(action)
             agent.update(action)
             print(f"STATE : {agent.state}")
             print(f"SCORE : {agent.score}")
-            count += 1
 
-        if agent.score > max:
-            max = agent.score
-            boucle = i + 1
+        finance_service.define_current_interval(finance_service.current_interval.last_valid_index, interval)
 
-    print(f"MAX SCORE : {max} à la boucle {boucle}")
-
-    print(pretty(agent.qtable))
+    #
+    # max = -10000
+    # boucle = 1
+    # ##while agent.state != goal:
+    # for i in range(100):
+    #     print("")
+    #     print(f"GRAND TOUR {i + 1}")
+    #     agent.reset()
+    #     count = 1
+    #     for date, stock in finance_service.stock_history.iterrows():
+    #         print("")
+    #         print(f"TOUR {count}")
+    #         print(f"DATE : {date} STOCK : {stock['Close']}")
+    #         agent.current_date = date
+    #         action = agent.best_action()
+    #         print(f"BEST ACTION : {action}")
+    #         agent.do_action(action)
+    #         agent.update(action)
+    #         print(f"STATE : {agent.state}")
+    #         print(f"SCORE : {agent.score}")
+    #         count += 1
+    #
+    #     if agent.score > max:
+    #         max = agent.score
+    #         boucle = i + 1
+    #
+    # print(f"MAX SCORE : {max} à la boucle {boucle}")
+    #
+    # print(pretty(agent.qtable))
