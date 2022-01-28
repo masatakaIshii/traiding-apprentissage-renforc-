@@ -16,7 +16,8 @@ def pretty(d, indent=0):
 
 if __name__ == '__main__':
     wallet = Wallet()
-    finance_service = FinanceService(8)
+    finance_service = FinanceService(
+        8)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
     start_date = "2019-01-01"
     end_date = "2020-01-01"
     finance_service.load_history("AAPL", start_date, end_date)
@@ -24,21 +25,24 @@ if __name__ == '__main__':
     agent = Agent(wallet_service)
 
     interval = 14
-    finance_service.define_current_interval("2019-01-01",
+    finance_service.define_current_interval("2019-01-01 00:00:00",
                                             interval)  # 14 premiers jours donc je peux faire calcul moyenne
-    agent.current_date = finance_service.current_interval.last_valid_index
-    while datetime.strptime(agent.current_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d'):
+    agent.current_date = str(finance_service.current_interval.last_valid_index())
+    while agent.current_date:
+        print(f"CURRENT DATE : {agent.current_date}")
 
         for i in range(interval):
             agent.current_date = finance_service.next_date(agent.current_date)  # on est sur la date d'après
+            if not agent.current_date:
+                break
+            print(f"CURRENT DATE : {agent.current_date}")
             action = agent.best_action()
             print(f"BEST ACTION : {action}")
             agent.do_action(action)
             agent.update(action)
             print(f"STATE : {agent.state}")
             print(f"SCORE : {agent.score}")
-
-        finance_service.define_current_interval(finance_service.current_interval.last_valid_index, interval)
+        finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
 
     #
     # max = -10000

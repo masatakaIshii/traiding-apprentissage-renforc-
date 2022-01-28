@@ -41,7 +41,9 @@ class FinanceService:
 
     def get_state_by_date(self, date: str) -> int:
         value = self.get_value_by_date(date)
+        print(f"VALUE BY DATE : {value}")
         variation_percentage = self.get_variation_percentage(value)
+        print(f"VARIATION PERCENTAGE : {variation_percentage}")
         return self.determine_state_by_value(variation_percentage)
 
     def determine_state_by_value(self, value: float) -> int:
@@ -50,7 +52,7 @@ class FinanceService:
         cur_value = -50
         for i in range(self.__category_number):
             superior_limit = cur_value + 100 // self.__category_number
-            if cur_value >= value >= superior_limit:
+            if cur_value <= value <= superior_limit:
                 return i
             cur_value = superior_limit
         return self.__category_number - 1
@@ -68,8 +70,9 @@ class FinanceService:
     def current_interval(self):
         return self.__current_interval
 
-    def define_current_interval(self, start_date, days):
-        start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+    def define_current_interval(self, start_date: str, days: int):
+        start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
+        # TODO Pb avec les dates ici, quoike
         end_date = start_date_datetime + timedelta(days=days)
         self.__current_interval = self.__stock_history.loc[start_date:end_date]
         self.__average_value = self.get_average_value()
