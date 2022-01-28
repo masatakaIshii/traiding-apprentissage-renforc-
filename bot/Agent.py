@@ -6,7 +6,10 @@
 # - update avec les rewards
 # - les rewards du coup lol
 from bot.Action import Action
+from logic.Stock import Stock
 from logic.service.WalletService import WalletService
+
+REWARD_FORBIDDEN_ACTION = -1000
 
 
 class Agent:
@@ -16,6 +19,7 @@ class Agent:
         self.__learning_rate = learning_rate
         self.__discount_factor = discount_factor
         self.__qtable = {}
+        self.__did_forbidden_action = False
         self.init_qtable()
         self.reset()
 
@@ -61,21 +65,27 @@ class Agent:
         self.__wallet_service.reset()
         self.__score = 0
 
+    # 100
+    # 50 50 -> 100
+    # 50 55 -> 105
+    # 50 52 -> 102
     def calculate_reward(self) -> float:
+        if self.__did_forbidden_action:
+            return REWARD_FORBIDDEN_ACTION
         last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
-        print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
+        # print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
         # if last_action_profit_percentage == 0:
         #     last_action_profit_percentage = -10
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
-    def update(self, action: Action):
-        print(f"NOUVEL ETAT {self.__state}")
+    def update(self, action: Action, maybe_stock_bought: Stock | None):
+        print(f"ETAT ACTUEL {self.__state}")
         reward = self.calculate_reward()
         print(f"REWARD : {reward}")
         # TODO faut d'abord voir si on a bought du coup
-        has_bought = self.__wallet_service.has_bought()
-        if not has_bought:
+        # contains_stock = self.__wallet_service.contains_stock()
+        if maybe_stock_bought is None:
             maxQ = max(self.__qtable[self.__state][False].values())
             self.__qtable[self.__state][False][action] += self.__learning_rate * \
                                                           (reward + self.__discount_factor * maxQ -
@@ -83,7 +93,8 @@ class Agent:
                                                                action])
         else:
             bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
-                self.__wallet_service.get_stock(0).purchase_date)
+                maybe_stock_bought.purchase_date)
+            print(f"STOCK STATE : {bought_stock_state}")
             maxQ = max(self.__qtable[self.__state][True][bought_stock_state].values())
 
             self.__qtable[self.__state][True][bought_stock_state][action] += self.__learning_rate * \
@@ -100,7 +111,7 @@ class Agent:
             case Action.BUY:  # TODO Refacto pour les montants
                 return self.__wallet_service.can_buy_stock(50)
             case Action.SELL:
-                return self.__wallet_service.has_bought()
+                return self.__wallet_service.contains_stock()
             case _:
                 return True
 
@@ -109,31 +120,44 @@ class Agent:
         self.__state = self.__wallet_service.finance_service.get_state_by_date(self.__current_date)
         qtable = self.__qtable[self.__state]
 
-        if self.__wallet_service.has_bought():
+        if self.__wallet_service.contains_stock():
             bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
                 self.__wallet_service.get_stock(0).purchase_date)
             for action in qtable[True][bought_stock_state]:
-                if self.can_perform_action(action):
-                    if not best \
-                            or qtable[True][bought_stock_state][action] > qtable[True][bought_stock_state][best]:
-                        best = action
+                # if self.can_perform_action(action):
+                if not best \
+                        or qtable[True][bought_stock_state][action] > qtable[True][bought_stock_state][best]:
+                    best = action
         else:
 
             for action in qtable[False]:
-                if self.can_perform_action(action):
-                    if not best \
-                            or qtable[False][action] > qtable[False][best]:
-                        best = action
+                # if self.can_perform_action(action):
+                if not best \
+                        or qtable[False][action] > qtable[False][best]:
+                    best = action
         return best
 
     def do_action(self, action: Action):
+        print(f"ACTION : {action}")
+        self.__did_forbidden_action = False
         match action:
             case Action.BUY:
                 # TODO je ne sais pas quoi mettre pour le montant
-                self.__wallet_service.buy_stock(self.__current_date, 50)
+                if self.__wallet_service.contains_stock():
+                    self.__did_forbidden_action = True
+                else:
+                    try:
+                        self.__wallet_service.buy_stock(self.__current_date, 50)
+                    except:
+                        self.__did_forbidden_action = True
+
             case Action.SELL:
                 # TODO je ne vois pas comment faire avec plusieurs stocks pour l'instant
-                self.__wallet_service.sell_stock_and_return_profit(0, self.__current_date)
+                if self.__wallet_service.contains_stock():
+                    self.__wallet_service.sell_stock_and_return_profit(0, self.__current_date)
+                else:
+                    self.__did_forbidden_action = True
+
             # case Action.KEEP:
             #     self.__wallet_service.keep_stock()
         print(f"ARGENT ACTUEL {self.__wallet_service.get_amount()}")

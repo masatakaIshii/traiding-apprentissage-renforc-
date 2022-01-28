@@ -71,9 +71,9 @@ class WalletService:
     #     return (self.__wallet.wallet_amount - self.__wallet.initial_value) / self.__wallet.initial_value * 100
 
     def can_buy_stock(self, amount: float) -> bool:
-        return self.__wallet.wallet_amount > amount
+        return len(self.__wallet.stocks) <= 0 and self.__wallet.wallet_amount > amount
 
-    def has_bought(self) -> bool:
+    def contains_stock(self) -> bool:
         return len(self.__wallet.stocks) > 0
 
     def get_potentiel_total_amount(self, current_date: str) -> float:
