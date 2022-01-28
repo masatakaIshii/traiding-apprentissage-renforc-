@@ -3,6 +3,16 @@ from bot.Agent import Agent
 from logic.FinanceService import FinanceService
 from logic.Wallet import Wallet
 from logic.service.WalletService import WalletService
+import threading
+import tkinter
+
+import pandas
+
+# # get stock info
+from gui.TradingView import TradingView
+from gui.TradingController import TradingController
+from logic.Wallet import Wallet
+from logic.service.WalletService import WalletService
 
 
 def pretty(d, indent=0):
@@ -15,6 +25,17 @@ def pretty(d, indent=0):
 
 
 if __name__ == '__main__':
+    root = tkinter.Tk()
+    trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
+
+    finance_service = FinanceService()
+    finance_service.set_stock_history(trading_data)
+
+    wallet_service = WalletService(wallet=Wallet(), finance_service=finance_service)
+
+    trading_view = TradingView(master=root)
+    trading_controller = TradingController(master=root, wallet_service=wallet_service, view=trading_view),
+
     wallet = Wallet()
     finance_service = FinanceService(
         8)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
@@ -44,32 +65,6 @@ if __name__ == '__main__':
             print(f"SCORE : {agent.score}")
         finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
 
-    #
-    # max = -10000
-    # boucle = 1
-    # ##while agent.state != goal:
-    # for i in range(100):
-    #     print("")
-    #     print(f"GRAND TOUR {i + 1}")
-    #     agent.reset()
-    #     count = 1
-    #     for date, stock in finance_service.stock_history.iterrows():
-    #         print("")
-    #         print(f"TOUR {count}")
-    #         print(f"DATE : {date} STOCK : {stock['Close']}")
-    #         agent.current_date = date
-    #         action = agent.best_action()
-    #         print(f"BEST ACTION : {action}")
-    #         agent.do_action(action)
-    #         agent.update(action)
-    #         print(f"STATE : {agent.state}")
-    #         print(f"SCORE : {agent.score}")
-    #         count += 1
-    #
-    #     if agent.score > max:
-    #         max = agent.score
-    #         boucle = i + 1
-    #
-    # print(f"MAX SCORE : {max} à la boucle {boucle}")
-    #
-    # print(pretty(agent.qtable))
+    print(f"MAX SCORE : {max} à la boucle {boucle}")
+
+    print(pretty(agent.qtable))

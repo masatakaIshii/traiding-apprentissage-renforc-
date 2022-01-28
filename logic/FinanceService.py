@@ -1,4 +1,5 @@
 from datetime import timedelta
+from tokenize import String
 from typing import Optional
 
 import pandas as pd
@@ -10,6 +11,9 @@ from datetime import datetime
 
 # Doit pendre en paramètre le nombre de catégorie qu'on veut
 class FinanceService:
+    start_date: str
+    end_date: str
+
     def __init__(self, category_number: int = 5):
         self.__category_number = category_number
         self.__stock_history = pd.DataFrame()
@@ -18,6 +22,9 @@ class FinanceService:
 
     # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
+        self.start_date = start_date
+
+        self.end_date = end_date
         ticker = yf.Ticker(stock_name)
         self.__stock_history = ticker.history(interval="1d", start=start_date, end=end_date)
 
@@ -66,6 +73,9 @@ class FinanceService:
     def stock_history(self):
         return self.__stock_history
 
+    def set_stock_history(self, new_stock_history):
+        self.__stock_history = new_stock_history
+
     @property
     def current_interval(self):
         return self.__current_interval
@@ -95,10 +105,13 @@ class FinanceService:
 
     # def get_average_value_last_history_range(self, start_date, days):
 
-    # def get_interval_one_stock_history(self, start_date, days):
+    # def get_interval_one_stock_history(self, start_date: str, days: int):
     #     try:
     #         start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
     #         end_date = start_date_datetime + timedelta(days=days)
-    #         return self.__stock_history.loc[start_date:end_date]['Close']
+    #         return self.__stock_history.loc[start_date:end_date]
     #     except:
     #         return None
+
+    def get_first_date_of_stock_history(self) -> str:
+        return self.__stock_history.index[0]
