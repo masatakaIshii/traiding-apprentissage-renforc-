@@ -62,10 +62,10 @@ class TradingView(tkinter.Frame):
 
         # Count bot iteration
         count_bot_container = tkinter.LabelFrame(bot_container, padx=10, pady=10)
-        count_bot_label = tkinter.Label(count_bot_container, text="Count :")
-        count_bot_label.grid(row=0, column=0)
-        self.__count_bot_value = tkinter.Label(count_bot_container, text="Not yet")
-        self.__count_bot_value.grid(row=0, column=1)
+        iteration_bot_label = tkinter.Label(count_bot_container, text="Iteration :")
+        iteration_bot_label.grid(row=0, column=0)
+        self.__iteration_bot_value = tkinter.Label(count_bot_container, text="Not yet")
+        self.__iteration_bot_value.grid(row=0, column=1)
 
         count_bot_container.grid(row=0)
 
@@ -82,6 +82,20 @@ class TradingView(tkinter.Frame):
         action_container.grid(row=1, column=0)
 
         bot_container.pack(pady=10)
+
+        # Historic
+        historic_container = tkinter.LabelFrame(master, text="Historic", padx=10, pady=10)
+
+        list_benefice_container = tkinter.LabelFrame(historic_container, padx=10, pady=10)
+
+        list_benefice_label = tkinter.Label(list_benefice_container, text="Benefices")
+        list_benefice_label.grid(row=0, column=0)
+        self.__list_benefice = tkinter.Listbox(list_benefice_container, width=30)
+        self.__list_benefice.grid(row=1, column=0)
+
+        list_benefice_container.grid(row=0, column=0)
+
+        historic_container.pack()
 
         # Pack TradingView
         self.pack()
@@ -107,7 +121,7 @@ class TradingView(tkinter.Frame):
         self.__current_stock_amount["text"] = str(stock_amount) if stock_amount is not None else "Empty"
 
     def set_count_bot_iter(self, count: int):
-        self.__count_bot_value["text"] = str(count)
+        self.__iteration_bot_value["text"] = str(count)
 
     def update_action_labels_depend_to_action(self, action):
         self.__reset_action_labels()
@@ -133,3 +147,6 @@ class TradingView(tkinter.Frame):
 
         self.__action_sell["fg"] = "#00f"
         self.__action_sell["bg"] = "#fff"
+
+    def insert_benefice_in_list(self, benefice: float, date: str):
+        self.__list_benefice.insert(0, f"{date}: Benefice is {benefice}")

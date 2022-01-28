@@ -17,10 +17,12 @@ class TradingController:
         self.__view = view
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
-        self.__str_actions: List[string] = []
+        self.__str_wallet_actions: List[string] = []
         self.__view.start_button.bind("<Button>", self.start)
         self.__view.set_wallet_amount(self.__wallet_service.get_amount())
         self.__view.set_current_date(self.__current_date)
+
+        self.__old_wallet_amount = self.__wallet_service.get_amount()
 
         self.__set_master_tk()
         self.__is_pause = True
@@ -41,7 +43,6 @@ class TradingController:
         threading.Thread(target=self.process).start()
 
     def process(self):
-        finance_service = self.__wallet_service.finance_service
         agent = Agent(self.__wallet_service)
         max_value = -10000
         iteration = 1
@@ -50,26 +51,50 @@ class TradingController:
             count = 1
             agent.reset()
             self.__view.set_count_bot_iter(count=iteration)
-            for date, stock in finance_service.stock_history.iterrows():
-                if self.__is_pause is True:
-                    break
-                time.sleep(0.1)
-                agent.current_date = date
-                self.__view.set_current_date(date)
-                action = agent.best_action()
-                agent.do_action(action)
-                agent.update(action)
-                if temp_action is not action:
-                    self.__view.update_action_labels_depend_to_action(action)
-                    temp_action = action
-                self.__update_wallet_and_stock(stock=stock)
-
-                count += 1
+            temp_action = self.__one_iter(agent, count, temp_action)
 
             if agent.score > max_value:
                 max_value = agent.score
                 iteration = iteration + 1
         print(f"MAX SCORE : {max_value} à la boucle {iteration}")
+
+    def __one_iter(self, agent: Agent, curren_count: int, current_action: Action | None) -> Action:
+        finance_service = self.__wallet_service.finance_service
+        count = curren_count
+
+        iter_wesh = 0
+        for date, stock in finance_service.stock_history.iterrows():
+            if self.__is_pause is True:
+                break
+            time.sleep(0.1)
+            agent.current_date = date
+            self.__view.set_current_date(date)
+            new_action = agent.best_action()
+            self.agent_action_and_update(agent, new_action)
+
+            if current_action is not new_action:
+                self.__view.update_action_labels_depend_to_action(new_action)
+                current_action = new_action
+            self.__update_wallet_and_stock(stock=stock)
+            count += 1
+
+            if new_action is Action.SELL and iter_wesh == 3:
+                self.pause()
+            elif new_action is Action.SELL:
+                iter_wesh = iter_wesh + 1
+        print(f"Count ======================> {count}")
+        return current_action
+
+    def agent_action_and_update(self, agent: Agent, action: Action):
+        if action is Action.BUY and self.__wallet_service.get_stock(0) is None:
+            self.__old_wallet_amount = self.__wallet_service.get_amount()
+
+        agent.do_action(action)
+        agent.update(action)
+
+        if action is Action.SELL:
+            benefice = self.__wallet_service.get_amount() - self.__old_wallet_amount
+            self.__view.insert_benefice_in_list(benefice=round(benefice, 2), date=agent.current_date)
 
     def pause(self, _):
         self.__view.pause_button_clicked()
@@ -90,4 +115,4 @@ class TradingController:
 
     @property
     def str_actions(self):
-        return self.__str_actions
+        return self.__str_wallet_actions
