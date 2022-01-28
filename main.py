@@ -1,3 +1,4 @@
+import threading
 import tkinter
 
 import pandas
@@ -33,13 +34,9 @@ if __name__ == '__main__':
 
     wallet_service = WalletService(wallet=Wallet(), finance_service=finance_service)
 
-    root.minsize(720, 480)
-    root.title("Trading bot")
-
     trading_view = TradingView(master=root)
-    trading_controller = TradingController(wallet_service=wallet_service, view=trading_view),
+    trading_controller = TradingController(master=root, wallet_service=wallet_service, view=trading_view),
 
-    root.mainloop()
 
     # wallet = Wallet()
 
