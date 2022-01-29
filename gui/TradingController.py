@@ -6,15 +6,17 @@ from typing import List
 
 from bot.Action import Action
 from bot.Agent import Agent
-from gui.TradingView import TradingView
-from logic.service.WalletService import WalletService
+from gui import TradingView
+from process import ProcessBot
 
 
 class TradingController:
-    def __init__(self, master: Tk, wallet_service: WalletService, view: TradingView):
+    def __init__(self, master: Tk, view: TradingView, process_bot: ProcessBot):
+        self.__process_bot = process_bot
         self.__master = master
-        self.__wallet_service = wallet_service
+        self.__wallet_service = process_bot.wallet_service
         self.__view = view
+        self.__agent = process_bot.agent
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
         self.__str_wallet_actions: List[string] = []
@@ -24,6 +26,7 @@ class TradingController:
 
         self.__old_wallet_amount = self.__wallet_service.get_amount()
 
+        self.__process_bot.set_controller(self)
         self.__set_master_tk()
         self.__is_pause = True
 
@@ -40,23 +43,24 @@ class TradingController:
         print("controller start")
         self.__is_pause = False
 
-        threading.Thread(target=self.process).start()
+        threading.Thread(target=self.__process_bot.process).start()
 
     def process(self):
-        agent = Agent(self.__wallet_service)
-        max_value = -10000
-        iteration = 1
-        temp_action = Action.BUY
-        while iteration < 1000 and self.__is_pause is False:
-            count = 1
-            agent.reset()
-            self.__view.set_count_bot_iter(count=iteration)
-            temp_action = self.__one_iter(agent, count, temp_action)
-
-            if agent.score > max_value:
-                max_value = agent.score
-                iteration = iteration + 1
-        print(f"MAX SCORE : {max_value} à la boucle {iteration}")
+        pass
+        # agent = Agent(self.__wallet_service)
+        # max_value = -10000
+        # iteration = 1
+        # temp_action = Action.BUY
+        # while iteration < 1000 and self.__is_pause is False:
+        #     count = 1
+        #     agent.reset()
+        #     self.__view.set_count_bot_iter(count=iteration)
+        #     temp_action = self.__one_iter(agent, count, temp_action)
+        #
+        #     if agent.score > max_value:
+        #         max_value = agent.score
+        #         iteration = iteration + 1
+        # print(f"MAX SCORE : {max_value} à la boucle {iteration}")
 
     def __one_iter(self, agent: Agent, curren_count: int, current_action: Action | None) -> Action:
         finance_service = self.__wallet_service.finance_service
