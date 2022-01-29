@@ -57,6 +57,14 @@ class Agent:
     def qtable(self):
         return self.__qtable
 
+    # @property
+    # def wallet_service(self) -> WalletService:
+    #     return self.__wallet_service
+    #
+    # @wallet_service.setter
+    # def wallet_service(self, value: WalletService):
+    #     self.__wallet_service = value
+
     def get_current_money_amount(self):
         return self.__wallet_service.get_amount()
 
@@ -69,22 +77,31 @@ class Agent:
     # 50 50 -> 100
     # 50 55 -> 105
     # 50 52 -> 102
-    def calculate_reward(self) -> float:
+    def calculate_reward(self, action: Action, stock: Stock | None) -> float:
         if self.__did_forbidden_action:
             return REWARD_FORBIDDEN_ACTION
-        last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
+        if action is Action.SELL:
+            print(
+                f"VALEUR ACTUEL : {self.__wallet_service.finance_service.get_value_by_date(self.__current_date)} VALEUR ACHAT : {stock.purchase_value / (stock.share_percentage / 100)}")
+            print(f"KJVBEJOL {stock.share_percentage}")
+
+            last_action_profit_percentage = self.__wallet_service.finance_service \
+                .get_variation_percentage(self.__wallet_service.finance_service.get_value_by_date(self.__current_date),
+                                          stock.purchase_value / (stock.share_percentage / 100))
+        else:
+            last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
         # print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
         # if last_action_profit_percentage == 0:
         #     last_action_profit_percentage = -10
+        print(f"Last PROFIT PERCENTAGE : {last_action_profit_percentage}")
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
     def update(self, action: Action, maybe_stock_bought: Stock | None):
         print(f"ETAT ACTUEL {self.__state}")
-        reward = self.calculate_reward()
+        reward = self.calculate_reward(action, stock=maybe_stock_bought)
         print(f"REWARD : {reward}")
-        # TODO faut d'abord voir si on a bought du coup
-        # contains_stock = self.__wallet_service.contains_stock()
+
         if maybe_stock_bought is None:
             maxQ = max(self.__qtable[self.__state][False].values())
             self.__qtable[self.__state][False][action] += self.__learning_rate * \
@@ -124,25 +141,22 @@ class Agent:
             bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
                 self.__wallet_service.get_stock(0).purchase_date)
             for action in qtable[True][bought_stock_state]:
-                # if self.can_perform_action(action):
                 if not best \
                         or qtable[True][bought_stock_state][action] > qtable[True][bought_stock_state][best]:
                     best = action
         else:
 
             for action in qtable[False]:
-                # if self.can_perform_action(action):
                 if not best \
                         or qtable[False][action] > qtable[False][best]:
                     best = action
         return best
 
     def do_action(self, action: Action):
-        print(f"ACTION : {action}")
+        # print(f"ACTION : {action}")
         self.__did_forbidden_action = False
         match action:
             case Action.BUY:
-                # TODO je ne sais pas quoi mettre pour le montant
                 if self.__wallet_service.contains_stock():
                     self.__did_forbidden_action = True
                 else:
@@ -152,7 +166,6 @@ class Agent:
                         self.__did_forbidden_action = True
 
             case Action.SELL:
-                # TODO je ne vois pas comment faire avec plusieurs stocks pour l'instant
                 if self.__wallet_service.contains_stock():
                     self.__wallet_service.sell_stock_and_return_profit(0, self.__current_date)
                 else:

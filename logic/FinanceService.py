@@ -47,9 +47,9 @@ class FinanceService:
         return sum / len(self.__current_interval)
 
     def get_state_by_date(self, date: str) -> int:
-        value = self.get_value_by_date(date) # 3$ avec une moyenne des deux semaines préc. à 2$
+        value = self.get_value_by_date(date)  # 3$ avec une moyenne des deux semaines préc. à 2$
         print(f"VALUE BY DATE : {value}")
-        variation_percentage = self.get_variation_percentage(value) # +50%
+        variation_percentage = self.get_variation_percentage_with_average(value)  # +50%
         print(f"VARIATION PERCENTAGE : {variation_percentage}")
         return self.determine_state_by_value(variation_percentage)
 
@@ -64,10 +64,13 @@ class FinanceService:
             cur_value = superior_limit
         return self.__category_number - 1
 
-    def get_variation_percentage(self, value: float) -> float:
-        if self.__average_value == value or self.__average_value == 0:
+    def get_variation_percentage_with_average(self, value: float) -> float:
+        return self.get_variation_percentage(value, self.__average_value)
+
+    def get_variation_percentage(self, value: float, precedent_value: float) -> float:
+        if precedent_value == value or precedent_value == 0:
             return 0
-        return (value - self.__average_value) / self.__average_value * 100
+        return (value - precedent_value) / precedent_value * 100
 
     @property
     def stock_history(self):
