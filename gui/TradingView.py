@@ -13,8 +13,8 @@ class TradingView(tkinter.Frame):
         self.start_button = tkinter.Button(buttons_container, text="Start")
         self.start_button.grid(row=0, column=0, padx=5, pady=5)
 
-        self.pause_button = tkinter.Button(buttons_container, text="Pause", state=DISABLED)
-        self.pause_button.grid(row=0, column=1, padx=5, pady=5)
+        self.stop_button = tkinter.Button(buttons_container, text="Stop", state=DISABLED)
+        self.stop_button.grid(row=0, column=2, padx=5, pady=5)
         buttons_container.pack(pady=10)
 
         # Wallet and Stock Container
@@ -102,11 +102,11 @@ class TradingView(tkinter.Frame):
 
     def start_button_clicked(self):
         self.start_button["state"] = DISABLED
-        self.pause_button["state"] = NORMAL
+        self.stop_button["state"] = NORMAL
 
-    def pause_button_clicked(self):
+    def stop_button_clicked(self):
         self.start_button["state"] = NORMAL
-        self.pause_button["state"] = DISABLED
+        self.stop_button["state"] = DISABLED
 
     def set_wallet_amount(self, wallet_amount: float):
         self.__wallet_amount["text"] = f"{str(wallet_amount)} €"
