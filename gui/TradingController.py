@@ -5,18 +5,18 @@ from typing import List
 
 from bot.Action import Action
 from bot.Agent import Agent
-from gui import TradingView
+from gui import TradingView, QTableController
 from logic import Stock
 from process import ProcessBot
 
 
 class TradingController:
-    def __init__(self, master: Tk, view: TradingView, process_bot: ProcessBot):
+    def __init__(self, view: TradingView, qtable_controller: QTableController,process_bot: ProcessBot):
         self.__process_bot = process_bot
-        self.__master = master
         self.__wallet_service = process_bot.wallet_service
         self.__view = view
         self.__agent = process_bot.agent
+        self.qtable_controller = qtable_controller
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
         self.__str_wallet_actions: List[string] = []
@@ -27,13 +27,7 @@ class TradingController:
         self.__old_wallet_amount = self.__wallet_service.get_amount()
 
         self.__process_bot.set_controller(self)
-        self.__set_master_tk()
         self.__is_stop = True
-
-    def __set_master_tk(self):
-        self.__master.title("Trading bot")
-
-        self.__master.mainloop()
 
     def start(self, _):
         self.__view.start_button_clicked()
@@ -54,17 +48,6 @@ class TradingController:
 
     def add_new_benefice(self, benefice: float, current_date: str):
         self.__view.insert_benefice_in_list(benefice=benefice, date=current_date)
-
-    def agent_action_and_update(self, agent: Agent, action: Action):
-        if action is Action.BUY and self.__wallet_service.get_stock(0) is None:
-            self.__old_wallet_amount = self.__wallet_service.get_amount()
-
-        agent.do_action(action)
-        agent.update(action)
-
-        if action is Action.SELL:
-            benefice = self.__wallet_service.get_amount() - self.__old_wallet_amount
-            self.__view.insert_benefice_in_list(benefice=round(benefice, 2), date=agent.current_date)
 
     def stop(self, _):
         self.__view.stop_button_clicked()

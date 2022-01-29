@@ -2,6 +2,7 @@ from datetime import datetime
 
 from bot.Action import Action
 from bot.Agent import Agent
+from gui import QTableView, QTableController
 from logic.FinanceService import FinanceService
 from logic.Wallet import Wallet
 from logic.service.WalletService import WalletService
@@ -30,14 +31,17 @@ def pretty(d, indent=0):
 if __name__ == '__main__':
     # root = tkinter.Tk()
     # trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
-    #
-    # finance_service = FinanceService()
-    # finance_service.set_stock_history(trading_data)
+
+    #finance_service = FinanceService()
     #
     # wallet_service = WalletService(wallet=Wallet(), finance_service=finance_service)
     #
     # trading_view = TradingView(master=root)
     # trading_controller = TradingController(master=root, wallet_service=wallet_service, view=trading_view),
+
+    wallet = Wallet()
+    finance_service = FinanceService(
+        5)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
     trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
 
     finance_service.set_stock_history(trading_data)
@@ -53,50 +57,38 @@ if __name__ == '__main__':
     process_bot = ProcessBot(finance_service, wallet_service, agent)
 
     root = tkinter.Tk()
+
+    qtable_view = QTableView(master=root)
+    qtable_controller = QTableController(view=qtable_view)
+
     trading_view = TradingView(master=root)
-    trading_controller = TradingController(master=root, view=trading_view, process_bot=process_bot)
+    trading_controller = TradingController(view=trading_view, qtable_controller=qtable_controller, process_bot=process_bot)
 
-    wallet = Wallet()
-    finance_service = FinanceService(
-        5)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
-    start_date = "2019-07-01"
-    end_date = "2020-07-01"
-    finance_service.load_history("MCD", start_date, end_date)
-    wallet_service = WalletService(wallet, finance_service)
-    agent = Agent(wallet_service)
+    root.title("Trading bot")
+    root.mainloop()
 
-    interval = 14
-
-    for i in range(100):
-        print("")
-        print("")
-        print("")
-        print(f"NOUVELLE BOUCLE {i}")
-        finance_service.define_current_interval("2019-07-01 00:00:00",
-                                                interval)  # 14 premiers jours donc je peux faire calcul moyenne
-        agent.reset()
-        agent.current_date = str(finance_service.current_interval.last_valid_index())
-        while agent.current_date:
-            # print(f"CURRENT DATE : {agent.current_date}")
-
-            for j in range(interval):
-                agent.current_date = finance_service.next_date(agent.current_date)  # on est sur la date d'après
-                if not agent.current_date:
-                    break
-                # print(f"CURRENT DATE : {agent.current_date}")
-                action = agent.best_action()
-                # print(f"BEST ACTION : {action}")
-                maybe_stock_bought = wallet_service.get_stock(0)
-                print(f"MAYBE STOCK : {maybe_stock_bought}")
-                print(f"ACTION : {action}")
-                # if action is Action.BUY:
-                #     maybe_stock_bought = None
-                agent.do_action(action)
-                agent.update(action, maybe_stock_bought)
-                print("")
-                print("")
-                # print(f"STATE : {agent.state}")
-                # print(f"SCORE : {agent.score}")
-            finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
-
-    pretty(agent.qtable)
+    # for i in range(5):
+    #
+    #     finance_service.define_current_interval("2018-12-31",
+    #                                             interval)  # 14 premiers jours donc je peux faire calcul moyenne
+    #     agent.current_date = str(finance_service.current_interval.last_valid_index())
+    #     while agent.current_date:
+    #         # print(f"CURRENT DATE : {agent.current_date}")
+    #
+    #         for i in range(interval):
+    #             agent.current_date = finance_service.next_date(agent.current_date)  # on est sur la date d'après
+    #             if not agent.current_date:
+    #                 break
+    #             # print(f"CURRENT DATE : {agent.current_date}")
+    #             action = agent.best_action()
+    #             # print(f"BEST ACTION : {action}")
+    #             maybe_stock_bought = wallet_service.get_stock(0)
+    #             # if action is Action.BUY:
+    #             #     maybe_stock_bought = None
+    #             agent.do_action(action)
+    #             agent.update(action, maybe_stock_bought)
+    #             # print(f"STATE : {agent.state}")
+    #             # print(f"SCORE : {agent.score}")
+    #         finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
+    #
+    # pretty(agent.qtable)

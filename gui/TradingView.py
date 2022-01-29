@@ -9,7 +9,7 @@ class TradingView(tkinter.Frame):
         super().__init__(master=master)
 
         # Buttons
-        buttons_container = tkinter.LabelFrame(master, padx=10, pady=10)
+        buttons_container = tkinter.LabelFrame(self, padx=10, pady=10)
         self.start_button = tkinter.Button(buttons_container, text="Start")
         self.start_button.grid(row=0, column=0, padx=5, pady=5)
 
@@ -18,7 +18,7 @@ class TradingView(tkinter.Frame):
         buttons_container.pack(pady=10)
 
         # Wallet and Stock Container
-        wallet_stocks_container = tkinter.LabelFrame(master, text="Wallet and stock information", padx=10, pady=10)
+        wallet_stocks_container = tkinter.LabelFrame(self, text="Wallet and stock information", padx=10, pady=10)
 
         # Wallet container
         wallet_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
@@ -58,7 +58,7 @@ class TradingView(tkinter.Frame):
         wallet_stocks_container.pack()
 
         # Bot container
-        bot_container = tkinter.LabelFrame(master, text="Bot information", padx=10, pady=10)
+        bot_container = tkinter.LabelFrame(self, text="Bot information", padx=10, pady=10)
 
         # Count bot iteration
         count_bot_container = tkinter.LabelFrame(bot_container, padx=10, pady=10)
@@ -84,7 +84,7 @@ class TradingView(tkinter.Frame):
         bot_container.pack(pady=10)
 
         # Historic
-        historic_container = tkinter.LabelFrame(master, text="Historic", padx=10, pady=10)
+        historic_container = tkinter.LabelFrame(self, text="Historic", padx=10, pady=10)
 
         list_benefice_container = tkinter.LabelFrame(historic_container, padx=10, pady=10)
 
@@ -98,7 +98,7 @@ class TradingView(tkinter.Frame):
         historic_container.pack()
 
         # Pack TradingView
-        self.pack()
+        self.grid(row=0, column=0, padx=10, pady=10)
 
     def start_button_clicked(self):
         self.start_button["state"] = DISABLED
