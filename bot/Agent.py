@@ -83,7 +83,7 @@ class Agent:
                                       stock.purchase_value / (stock.share_percentage / 100))
 
     def calculate_reward_keep(self, stock: Stock | None) -> float:
-        print(f"STOCK : {stock}")
+        # print(f"STOCK : {stock}")
         if stock is None:
             return self.__wallet_service.get_variation_with_average(self.__current_date)
 
@@ -106,14 +106,14 @@ class Agent:
         else:
             last_action_profit_percentage = 0
 
-        print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
+        # print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
     def update(self, action: Action, maybe_stock_bought: Stock | None):
         # print(f"ETAT ACTUEL {self.__state}")
         reward = self.calculate_reward(action, stock=maybe_stock_bought)
-        print(f"REWARD : {reward}")
+        # print(f"REWARD : {reward}")
 
         if maybe_stock_bought is None:
             maxQ = max(self.__qtable[self.__state][False].values())
@@ -168,8 +168,8 @@ class Agent:
         return best
 
     def do_action(self, action: Action):
-        print(f"ACTION : {action}")
-        print(f"SELF CATEGORIE : {self.__state}")
+        # print(f"ACTION : {action}")
+        # print(f"SELF CATEGORIE : {self.__state}")
         self.__did_forbidden_action = False
         match action:
             case Action.BUY:
@@ -189,4 +189,4 @@ class Agent:
 
             # case Action.KEEP:
             #     self.__wallet_service.keep_stock()
-        print(f"ARGENT ACTUEL {self.__wallet_service.get_amount()}")
+        # print(f"ARGENT ACTUEL {self.__wallet_service.get_amount()}")

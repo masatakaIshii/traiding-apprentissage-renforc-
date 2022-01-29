@@ -42,20 +42,20 @@ if __name__ == '__main__':
 
     wallet = Wallet()
     finance_service = FinanceService(
-        5)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
-    trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
+        10)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
+    # trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
 
-    finance_service.set_stock_history(trading_data)
-    # start_date = "2019-07-01"
-    # end_date = "2020-07-01"
-    # finance_service.load_history("MCD", start_date, end_date)
+    # finance_service.set_stock_history(trading_data)
+    start_date = "2019-07-01"
+    end_date = "2020-07-01"
+    finance_service.load_history("AAPL", start_date, end_date)
     wallet_service = WalletService(wallet, finance_service)
     agent = Agent(wallet_service)
     print(finance_service.stock_history)
 
     interval = 14
 
-    process_bot = ProcessBot(finance_service, wallet_service, agent)
+    process_bot = ProcessBot(finance_service, wallet_service, agent, "2019-07-01 00:00:00")
 
     root = tkinter.Tk()
 

@@ -91,8 +91,8 @@ class FinanceService:
         start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
         # TODO Pb avec les dates ici, quoike
         end_date = start_date_datetime + timedelta(days=days)
-        print(start_date)
-        print(str(end_date))
+        # print(start_date)
+        # print(str(end_date))
         self.__current_interval = self.__stock_history.loc[start_date:str(end_date)]
         self.__average_value = self.get_average_value()
 

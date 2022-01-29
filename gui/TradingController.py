@@ -15,7 +15,7 @@ class TradingController:
         self.__process_bot = process_bot
         self.__wallet_service = process_bot.wallet_service
         self.__view = view
-        self.__agent = process_bot.agent
+        self.__agent: Agent = process_bot.agent
         self.qtable_controller = qtable_controller
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()

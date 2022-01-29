@@ -5,11 +5,12 @@ from logic import FinanceService, WalletService, Stock
 
 class ProcessBot:
     def __init__(self, finance_service: FinanceService, wallet_service: WalletService,
-                 agent: Agent):
+                 agent: Agent, start_date: str):
         self.__controller: TradingController | None = None
         self.finance_service = finance_service
         self.wallet_service: WalletService = wallet_service
         self.agent: Agent = agent
+        self.__start_date = start_date
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
 
@@ -20,16 +21,21 @@ class ProcessBot:
         self.agent.init_qtable()
         self.agent.reset()
 
-    def process(self, start_date: str = "2018-12-31", days: int = 14):
+    def process(self, days: int = 14):
         if self.__controller is None:
             print("PROBLEM controller not initialize in ProcessBot")
             return
 
         current_action = Action.BUY
         for i in range(5):
+            self.agent.reset()
+            self.__controller.update_wallet()
+            print('Nouvelle itération')
+            print("")
             if self.__controller.is_stop is True:
                 break
-            self.finance_service.define_current_interval(start_date=start_date, days=days)
+
+            self.finance_service.define_current_interval(start_date=self.__start_date, days=days)
             self.agent.current_date = str(self.finance_service.current_interval.last_valid_index())
 
             while self.agent.current_date and self.__controller.is_stop is False:
