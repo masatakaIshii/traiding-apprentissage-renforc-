@@ -1,9 +1,6 @@
-import time
-
 from bot import Agent, Action
 from gui import TradingController
 from logic import FinanceService, WalletService, Stock
-from process import ProcessData
 
 
 class ProcessBot:
@@ -15,7 +12,6 @@ class ProcessBot:
         self.agent: Agent = agent
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
-        self.__date: ProcessData | None = None
 
     def set_controller(self, controller: TradingController):
         self.__controller = controller
@@ -23,7 +19,6 @@ class ProcessBot:
     def reset(self):
         self.agent.init_qtable()
         self.agent.reset()
-        self.__date = None
 
     def process(self, start_date: str = "2018-12-31", days: int = 14):
         if self.__controller is None:
@@ -40,15 +35,13 @@ class ProcessBot:
             while self.agent.current_date and self.__controller.is_stop is False:
                 rest_days = days
                 while rest_days > 0 and self.__controller.is_stop is False:
-                    #time.sleep(0.2)
+                    # time.sleep(0.2)
                     self.agent.current_date = self.finance_service.next_date(
                         self.agent.current_date)  # on est sur la date d'après
                     if not self.agent.current_date:
                         break
                     self.__controller.update_current_date(self.agent.current_date)
-                    # print(f"CURRENT DATE : {self.agent.current_date}")
                     new_action = self.agent.best_action()
-                    # print(f"BEST ACTION : {action}")
                     maybe_stock_bought = self.wallet_service.get_stock(0)
                     current_action = self.__proceed_agent_action_and_update_gui(current_action, new_action,
                                                                                 maybe_stock_bought)
@@ -56,7 +49,8 @@ class ProcessBot:
                 self.finance_service.define_current_interval(
                     str(self.finance_service.current_interval.last_valid_index()), days)
 
-        self.pretty(self.agent.qtable)
+        self.__controller.qtable_controller.reset_qtable()
+        self.__controller.qtable_controller.update_qtable(self.agent.qtable)
         self.__controller.stop(())
 
     def __proceed_agent_action_and_update_gui(self, current_action: Action, new_action: Action,
