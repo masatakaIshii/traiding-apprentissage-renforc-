@@ -20,6 +20,10 @@ class FinanceService:
         self.__current_interval = pd.DataFrame()
         self.__average_value = 0
 
+    @property
+    def average_value(self) -> float:
+        return self.__average_value
+
     # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
         self.start_date = start_date

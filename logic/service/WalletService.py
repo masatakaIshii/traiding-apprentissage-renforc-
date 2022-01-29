@@ -92,9 +92,24 @@ class WalletService:
     # def keep_stock(self, current_date: str):
     #     self.__wallet.last_wallet_amount = self.get_potentiel_total_amount(current_date)
 
+    def get_potential_amount(self, cur_date_str: str) -> float:
+        if len(self.__wallet.stocks) > 0:
+            stock = self.__wallet.stocks[0]
+            current_date_value = self.__finance_service.get_value_by_date(cur_date_str)
+            print(f"CURRENT VALUE : {current_date_value} DONC POT AMOUNT {self.__wallet.wallet_amount + current_date_value * stock.share_percentage / 100}")
+            return self.__wallet.wallet_amount + current_date_value * stock.share_percentage / 100
+        return self.__wallet.wallet_amount
+
     def reset(self):
         self.__wallet = Wallet()
 
     def update_last_amount(self, current_date: str):
         print(f"POTENTIAL VALUE {self.get_potentiel_total_amount(current_date)}")
         self.__wallet.last_wallet_amount = self.get_potentiel_total_amount(current_date)
+
+    def get_variation_with_average(self, cur_date_str: str):
+        average_value = self.__finance_service.average_value
+        current_value = self.__finance_service.get_value_by_date(cur_date_str)
+        print(f"DATE VALUE : {current_value}")
+        print(f"AVERAGE VALUE : {average_value}")
+        return self.__finance_service.get_variation_percentage(current_value, average_value)

@@ -76,7 +76,8 @@ if __name__ == '__main__':
         agent.current_date = str(finance_service.current_interval.last_valid_index())
         while agent.current_date:
             # print(f"CURRENT DATE : {agent.current_date}")
-
+            print("")
+            print("")
             for j in range(interval):
                 agent.current_date = finance_service.next_date(agent.current_date)  # on est sur la date d'après
                 if not agent.current_date:
@@ -85,6 +86,7 @@ if __name__ == '__main__':
                 action = agent.best_action()
                 # print(f"BEST ACTION : {action}")
                 maybe_stock_bought = wallet_service.get_stock(0)
+                print(f"Maybe stock : {maybe_stock_bought}")
                 # print(f"MAYBE STOCK : {maybe_stock_bought}")
                 # print(f"ACTION : {action}")
                 # if action is Action.BUY:
@@ -95,6 +97,7 @@ if __name__ == '__main__':
                 # print("")
                 # print(f"STATE : {agent.state}")
                 # print(f"SCORE : {agent.score}")
+                print("")
             finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
         print(f"ARGENT FINAL : {agent.wallet_service.get_amount()}")
     pretty(agent.qtable)

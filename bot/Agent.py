@@ -9,7 +9,7 @@ from bot.Action import Action
 from logic.Stock import Stock
 from logic.service.WalletService import WalletService
 
-REWARD_FORBIDDEN_ACTION = -1000
+REWARD_FORBIDDEN_ACTION = -10000
 
 
 class Agent:
@@ -77,23 +77,36 @@ class Agent:
         self.__wallet_service.reset()
         self.__score = 0
 
-    # 100
-    # 50 50 -> 100
-    # 50 55 -> 105
-    # 50 52 -> 102
+    def calculate_reward_sell(self, stock: Stock | None) -> float:
+        return self.__wallet_service.finance_service \
+            .get_variation_percentage(self.__wallet_service.finance_service.get_value_by_date(self.__current_date),
+                                      stock.purchase_value / (stock.share_percentage / 100))
+
+    def calculate_reward_keep(self, stock: Stock | None) -> float:
+        print(f"STOCK : {stock}")
+        if stock is None:
+            return self.__wallet_service.get_variation_with_average(self.__current_date)
+
+        return self.__wallet_service.finance_service.get_variation_percentage(
+            self.__wallet_service.get_amount() + stock.purchase_value
+            , self.__wallet_service.get_potential_amount(self.__current_date))
+
+    def calculate_reward_buy(self) -> float:
+        return self.__wallet_service.get_variation_with_average(self.__current_date) * -1
+
     def calculate_reward(self, action: Action, stock: Stock | None) -> float:
         if self.__did_forbidden_action:
             return REWARD_FORBIDDEN_ACTION
         if action is Action.SELL:
-            last_action_profit_percentage = self.__wallet_service.finance_service \
-                .get_variation_percentage(self.__wallet_service.finance_service.get_value_by_date(self.__current_date),
-                                          stock.purchase_value / (stock.share_percentage / 100))
+            last_action_profit_percentage = self.calculate_reward_sell(stock)
+        elif action is Action.KEEP:
+            last_action_profit_percentage = self.calculate_reward_keep(stock)
+        elif action is Action.BUY:
+            last_action_profit_percentage = self.calculate_reward_buy()
         else:
-            last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
-            print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
-        # if last_action_profit_percentage == 0:
-        #     last_action_profit_percentage = -10
-        # print(f"Last PROFIT PERCENTAGE : {last_action_profit_percentage}")
+            last_action_profit_percentage = 0
+
+        print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
@@ -105,9 +118,9 @@ class Agent:
         if maybe_stock_bought is None:
             maxQ = max(self.__qtable[self.__state][False].values())
             self.__qtable[self.__state][False][action] += round(self.__learning_rate * \
-                                                          (reward + self.__discount_factor * maxQ -
-                                                           self.__qtable[self.__state][False][
-                                                               action]), 2)
+                                                                (reward + self.__discount_factor * maxQ -
+                                                                 self.__qtable[self.__state][False][
+                                                                     action]), 2)
         else:
             bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
                 maybe_stock_bought.purchase_date)
@@ -115,22 +128,24 @@ class Agent:
             maxQ = max(self.__qtable[self.__state][True][bought_stock_state].values())
 
             self.__qtable[self.__state][True][bought_stock_state][action] += round(self.__learning_rate * \
-                                                                             (reward + self.__discount_factor * maxQ -
-                                                                              self.__qtable[self.__state][True][
-                                                                                  bought_stock_state][
-                                                                                  action]), 2)
+                                                                                   (
+                                                                                           reward + self.__discount_factor * maxQ -
+                                                                                           self.__qtable[
+                                                                                               self.__state][True][
+                                                                                               bought_stock_state][
+                                                                                               action]), 2)
         self.__score += reward
         self.__wallet_service.update_last_amount(self.__current_date)
         # TODO Update le last amount ici
 
-    def can_perform_action(self, action: Action) -> bool:
-        match action:
-            case Action.BUY:  # TODO Refacto pour les montants
-                return self.__wallet_service.can_buy_stock(50)
-            case Action.SELL:
-                return self.__wallet_service.contains_stock()
-            case _:
-                return True
+    # def can_perform_action(self, action: Action) -> bool:
+    #     match action:
+    #         case Action.BUY:  # TODO Refacto pour les montants
+    #             return self.__wallet_service.can_buy_stock(50)
+    #         case Action.SELL:
+    #             return self.__wallet_service.contains_stock()
+    #         case _:
+    #             return True
 
     def best_action(self):
         best = None
@@ -154,6 +169,7 @@ class Agent:
 
     def do_action(self, action: Action):
         print(f"ACTION : {action}")
+        print(f"SELF CATEGORIE : {self.__state}")
         self.__did_forbidden_action = False
         match action:
             case Action.BUY:
