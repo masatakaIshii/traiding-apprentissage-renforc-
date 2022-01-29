@@ -84,7 +84,7 @@ class FinanceService:
         return self.__current_interval
 
     def define_current_interval(self, start_date: str, days: int):
-        start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+        start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
         # TODO Pb avec les dates ici, quoike
         end_date = start_date_datetime + timedelta(days=days)
         print(start_date)

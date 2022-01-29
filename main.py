@@ -37,24 +37,24 @@ if __name__ == '__main__':
     # wallet_service = WalletService(wallet=Wallet(), finance_service=finance_service)
     #
     # trading_view = TradingView(master=root)
-    # trading_controller = TradingController(master=root, wallet_service=wallet_service, view=trading_view),
-    trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
-
-    finance_service.set_stock_history(trading_data)
-    # start_date = "2019-07-01"
-    # end_date = "2020-07-01"
-    # finance_service.load_history("MCD", start_date, end_date)
-    wallet_service = WalletService(wallet, finance_service)
-    agent = Agent(wallet_service)
-    print(finance_service.stock_history)
-
-    interval = 14
-
-    process_bot = ProcessBot(finance_service, wallet_service, agent)
-
-    root = tkinter.Tk()
-    trading_view = TradingView(master=root)
-    trading_controller = TradingController(master=root, view=trading_view, process_bot=process_bot)
+    # # trading_controller = TradingController(master=root, wallet_service=wallet_service, view=trading_view),
+    # trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
+    #
+    # finance_service.set_stock_history(trading_data)
+    # # start_date = "2019-07-01"
+    # # end_date = "2020-07-01"
+    # # finance_service.load_history("MCD", start_date, end_date)
+    # wallet_service = WalletService(wallet, finance_service)
+    # agent = Agent(wallet_service)
+    # print(finance_service.stock_history)
+    #
+    # interval = 14
+    #
+    # process_bot = ProcessBot(finance_service, wallet_service, agent)
+    #
+    # root = tkinter.Tk()
+    # trading_view = TradingView(master=root)
+    # trading_controller = TradingController(master=root, view=trading_view, process_bot=process_bot)
 
     wallet = Wallet()
     finance_service = FinanceService(
