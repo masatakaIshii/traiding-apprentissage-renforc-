@@ -13,7 +13,7 @@ REWARD_FORBIDDEN_ACTION = -1000
 
 
 class Agent:
-    def __init__(self, wallet_service: WalletService, learning_rate=1, discount_factor=0.5):
+    def __init__(self, wallet_service: WalletService, learning_rate=0.5, discount_factor=1):
         self.__actions = [Action.BUY, Action.KEEP, Action.SELL]
         self.__wallet_service = wallet_service
         self.__learning_rate = learning_rate
@@ -57,6 +57,10 @@ class Agent:
     def qtable(self):
         return self.__qtable
 
+    @property
+    def wallet_service(self) -> WalletService:
+        return self.__wallet_service
+
     # @property
     # def wallet_service(self) -> WalletService:
     #     return self.__wallet_service
@@ -81,44 +85,40 @@ class Agent:
         if self.__did_forbidden_action:
             return REWARD_FORBIDDEN_ACTION
         if action is Action.SELL:
-            print(
-                f"VALEUR ACTUEL : {self.__wallet_service.finance_service.get_value_by_date(self.__current_date)} VALEUR ACHAT : {stock.purchase_value / (stock.share_percentage / 100)}")
-            print(f"KJVBEJOL {stock.share_percentage}")
-
             last_action_profit_percentage = self.__wallet_service.finance_service \
                 .get_variation_percentage(self.__wallet_service.finance_service.get_value_by_date(self.__current_date),
                                           stock.purchase_value / (stock.share_percentage / 100))
         else:
             last_action_profit_percentage = self.__wallet_service.get_last_action_profit_percentage(self.__current_date)
-        # print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
+            print(f"LAST PROFIT PERC : {last_action_profit_percentage}")
         # if last_action_profit_percentage == 0:
         #     last_action_profit_percentage = -10
-        print(f"Last PROFIT PERCENTAGE : {last_action_profit_percentage}")
+        # print(f"Last PROFIT PERCENTAGE : {last_action_profit_percentage}")
         reward = last_action_profit_percentage ** 2
         return reward if last_action_profit_percentage > 0 else reward * -1
 
     def update(self, action: Action, maybe_stock_bought: Stock | None):
-        print(f"ETAT ACTUEL {self.__state}")
+        # print(f"ETAT ACTUEL {self.__state}")
         reward = self.calculate_reward(action, stock=maybe_stock_bought)
         print(f"REWARD : {reward}")
 
         if maybe_stock_bought is None:
             maxQ = max(self.__qtable[self.__state][False].values())
-            self.__qtable[self.__state][False][action] += self.__learning_rate * \
+            self.__qtable[self.__state][False][action] += round(self.__learning_rate * \
                                                           (reward + self.__discount_factor * maxQ -
                                                            self.__qtable[self.__state][False][
-                                                               action])
+                                                               action]), 2)
         else:
             bought_stock_state = self.__wallet_service.finance_service.get_state_by_date(
                 maybe_stock_bought.purchase_date)
-            print(f"STOCK STATE : {bought_stock_state}")
+            # print(f"STOCK STATE : {bought_stock_state}")
             maxQ = max(self.__qtable[self.__state][True][bought_stock_state].values())
 
-            self.__qtable[self.__state][True][bought_stock_state][action] += self.__learning_rate * \
+            self.__qtable[self.__state][True][bought_stock_state][action] += round(self.__learning_rate * \
                                                                              (reward + self.__discount_factor * maxQ -
                                                                               self.__qtable[self.__state][True][
                                                                                   bought_stock_state][
-                                                                                  action])
+                                                                                  action]), 2)
         self.__score += reward
         self.__wallet_service.update_last_amount(self.__current_date)
         # TODO Update le last amount ici
@@ -153,7 +153,7 @@ class Agent:
         return best
 
     def do_action(self, action: Action):
-        # print(f"ACTION : {action}")
+        print(f"ACTION : {action}")
         self.__did_forbidden_action = False
         match action:
             case Action.BUY:

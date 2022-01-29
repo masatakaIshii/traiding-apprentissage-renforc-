@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     wallet = Wallet()
     finance_service = FinanceService(
-        5)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
+        10)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
     start_date = "2019-07-01"
     end_date = "2020-07-01"
     finance_service.load_history("MCD", start_date, end_date)
@@ -67,9 +67,7 @@ if __name__ == '__main__':
 
     interval = 14
 
-    for i in range(100):
-        print("")
-        print("")
+    for i in range(40):
         print("")
         print(f"NOUVELLE BOUCLE {i}")
         finance_service.define_current_interval("2019-07-01 00:00:00",
@@ -87,16 +85,16 @@ if __name__ == '__main__':
                 action = agent.best_action()
                 # print(f"BEST ACTION : {action}")
                 maybe_stock_bought = wallet_service.get_stock(0)
-                print(f"MAYBE STOCK : {maybe_stock_bought}")
-                print(f"ACTION : {action}")
+                # print(f"MAYBE STOCK : {maybe_stock_bought}")
+                # print(f"ACTION : {action}")
                 # if action is Action.BUY:
                 #     maybe_stock_bought = None
                 agent.do_action(action)
                 agent.update(action, maybe_stock_bought)
-                print("")
-                print("")
+                # print("")
+                # print("")
                 # print(f"STATE : {agent.state}")
                 # print(f"SCORE : {agent.score}")
             finance_service.define_current_interval(str(finance_service.current_interval.last_valid_index()), interval)
-
+        print(f"ARGENT FINAL : {agent.wallet_service.get_amount()}")
     pretty(agent.qtable)

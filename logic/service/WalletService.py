@@ -96,4 +96,5 @@ class WalletService:
         self.__wallet = Wallet()
 
     def update_last_amount(self, current_date: str):
+        print(f"POTENTIAL VALUE {self.get_potentiel_total_amount(current_date)}")
         self.__wallet.last_wallet_amount = self.get_potentiel_total_amount(current_date)
