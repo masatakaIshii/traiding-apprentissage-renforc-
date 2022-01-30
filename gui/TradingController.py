@@ -2,19 +2,25 @@ import string
 import threading
 from typing import List
 
+from bot import Agent
 from bot.Action import Action
-from gui import TradingView, QTableController
+from gui import TradingView, QTableController, StockFormController
 from logic import Stock
 from process import ProcessBot
 
 
 class TradingController:
-    def __init__(self, view: TradingView, qtable_controller: QTableController,process_bot: ProcessBot):
+    def __init__(self,
+                 view: TradingView,
+                 qtable_controller: QTableController,
+                 stock_form_controller: StockFormController,
+                 process_bot: ProcessBot):
         self.__process_bot = process_bot
         self.__wallet_service = process_bot.wallet_service
         self.__view = view
         self.__agent: Agent = process_bot.agent
         self.qtable_controller = qtable_controller
+        self.stock_form_controller = stock_form_controller
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
         self.__str_wallet_actions: List[string] = []

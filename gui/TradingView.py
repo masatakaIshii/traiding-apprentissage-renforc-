@@ -103,21 +103,15 @@ class TradingView(tkinter.Frame):
         bot_container.pack(pady=10)
 
         # Historic
-        historic_container = tkinter.LabelFrame(self, text="Historic", padx=10, pady=10)
+        historic_container = tkinter.LabelFrame(self, text=" Benefice Historic", padx=10, pady=10)
 
-        list_benefice_container = tkinter.LabelFrame(historic_container, padx=10, pady=10)
-
-        list_benefice_label = tkinter.Label(list_benefice_container, text="Benefices")
-        list_benefice_label.grid(row=0, column=0)
-        self.__list_benefice = tkinter.Listbox(list_benefice_container, width=30)
-        self.__list_benefice.grid(row=1, column=0)
-
-        list_benefice_container.grid(row=0, column=0)
+        self.__list_benefice = tkinter.Listbox(historic_container, width=30)
+        self.__list_benefice.pack()
 
         historic_container.pack()
 
         # Pack TradingView
-        self.grid(row=0, column=0, padx=10, pady=10)
+        self.grid(row=0, column=0, rowspan=10, padx=10, pady=10)
 
     def start_button_clicked(self):
         self.start_button["state"] = DISABLED
