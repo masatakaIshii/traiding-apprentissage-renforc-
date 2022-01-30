@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     wallet = Wallet()
     finance_service = FinanceService(
-        10)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
+        30)  # 50 - 38 / 38 - 26 / 26 - 14 / 14 - 2 / 2 -10 / 10 - 22 / 22 - 34 / 34 - 48 / +
     # trading_data = pandas.read_csv("resource/masa.csv", sep=';').set_index('Date')
 
     # finance_service.set_stock_history(trading_data)

@@ -11,7 +11,7 @@ from process import ProcessBot
 
 
 class TradingController:
-    def __init__(self, view: TradingView, qtable_controller: QTableController,process_bot: ProcessBot):
+    def __init__(self, view: TradingView, qtable_controller: QTableController, process_bot: ProcessBot):
         self.__process_bot = process_bot
         self.__wallet_service = process_bot.wallet_service
         self.__view = view
@@ -63,7 +63,7 @@ class TradingController:
     def update_wallet_and_stock(self, stock: Stock):
         your_stock = self.__wallet_service.get_stock(0)
         if your_stock is not None:
-            self.__view.set_your_stock_amount(round(your_stock.purchase_value * your_stock.share_percentage / 100, 2))
+            self.__view.set_your_stock_amount(round(your_stock.purchase_value, 2))
         else:
             self.__view.set_your_stock_amount(None)
         self.update_wallet()

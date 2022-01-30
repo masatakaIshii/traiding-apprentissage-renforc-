@@ -7,13 +7,13 @@ from logic.exceptions.IncorrectBuyAmountError import IncorrectBuyAmountError
 
 
 class Wallet:
-    def __init__(self, wallet_amount=100):
+    def __init__(self, wallet_amount=5000):
         self.__wallet_amount: float = wallet_amount
         self.__last_wallet_amount: float = wallet_amount
         self.__initial_value: float = wallet_amount
         self.__stocks: [Stock] = []
 
-    def buy(self, stock_name, amount):
+    def buy(self, amount):
         if amount > self.__wallet_amount:
             raise IncorrectBuyAmountError
 
