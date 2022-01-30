@@ -28,12 +28,12 @@ class FinanceService:
 
     # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
-        self.stock_name = stock_name
-        self.start_date = start_date
-
-        self.end_date = end_date
         ticker = yf.Ticker(stock_name)
         self.__stock_history = ticker.history(interval="1d", start=start_date, end=end_date)
+
+        self.stock_name = stock_name
+        self.start_date = start_date
+        self.end_date = end_date
 
     # def determine_categories(self):
     #     percentage_limit = 100 // self.__category_number
