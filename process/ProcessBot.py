@@ -11,6 +11,7 @@ class ProcessBot:
         self.wallet_service: WalletService = wallet_service
         self.agent: Agent = agent
         self.__start_date = start_date
+        self.__last_date = start_date
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
 
@@ -43,6 +44,7 @@ class ProcessBot:
                 while rest_days > 0 and self.__controller.is_stop is False:
                     print("")
                     # time.sleep(0.2)
+                    self.__last_date = self.agent.current_date
                     self.agent.current_date = self.finance_service.next_date(
                         self.agent.current_date)  # on est sur la date d'après
                     if not self.agent.current_date:
@@ -57,6 +59,10 @@ class ProcessBot:
                 self.finance_service.define_current_interval(
                     str(self.finance_service.current_interval.last_valid_index()), days)
 
+            self.agent.sell_all_for_the_end(self.__last_date)
+            self.__last_date = self.agent.current_date
+            self.__controller.empty_stocks_wallet()
+            self.__controller.update_wallet()
         self.__controller.qtable_controller.reset_qtable()
         self.__controller.qtable_controller.update_qtable(self.agent.qtable)
         self.__controller.stop(())

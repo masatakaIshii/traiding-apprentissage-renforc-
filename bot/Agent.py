@@ -24,8 +24,6 @@ class Agent:
         self.reset()
 
     def init_qtable(self):
-        # TODO Ajouter dans la partie pas achat un boolean pour savoir si j'ai assez de thunes
-        # TODO Faut changer les montants mon gars djo
         for state in range(self.__wallet_service.finance_service.category_number):
             self.__qtable[state] = {}
             for stock_state in [False, True]:
@@ -143,7 +141,6 @@ class Agent:
         self.__score += reward
         # self.__wallet_service.update_last_amount(self.__current_date)
 
-
     # def can_perform_action(self, action: Action) -> bool:
     #     match action:
     #         case Action.BUY:  # TODO Refacto pour les montants
@@ -172,6 +169,10 @@ class Agent:
                         or qtable[False][able_to_buy][action] > qtable[False][able_to_buy][best]:
                     best = action
         return best
+
+    def sell_all_for_the_end(self, date: str):
+        if self.__wallet_service.contains_stock():
+            self.__wallet_service.sell_stock_and_return_profit(0, date)
 
     def is_able_to_buy(self) -> bool:
         return True if self.__wallet_service.get_amount() - self.__wallet_service.finance_service.get_value_by_date(

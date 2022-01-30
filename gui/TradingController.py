@@ -77,3 +77,7 @@ class TradingController:
     @property
     def is_stop(self):
         return self.__is_stop
+
+    def empty_stocks_wallet(self):
+        self.__view.set_your_stock_amount(None)
+        self.__view.set_cur_stock_amount(None)
