@@ -31,11 +31,15 @@ class TradingView(tkinter.Frame):
         self.stock_index_value = tkinter.Label(stock_history_container, text="Default")
         self.stock_index_value.grid(row=0, column=1)
 
-        self.stock_box = tkinter.Entry(stock_history_container)
-        self.stock_box.grid(row=1, column=0, padx=10)
+        self.stock_start_date_label = tkinter.Label(stock_history_container, text="Start date :")
+        self.stock_start_date_label.grid(row=1, column=0)
+        self.stock_start_date_value = tkinter.Label(stock_history_container, text="Not yet")
+        self.stock_start_date_value.grid(row=1, column=1)
 
-        self.stock_load_button = tkinter.Button(stock_history_container, text="Load new index")
-        self.stock_load_button.grid(row=1, column=1)
+        self.stock_end_date_label = tkinter.Label(stock_history_container, text="End date :")
+        self.stock_end_date_label.grid(row=2, column=0)
+        self.stock_end_date_value = tkinter.Label(stock_history_container, text="Not yet")
+        self.stock_end_date_value.grid(row=2, column=1)
 
         stock_history_container.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
@@ -163,3 +167,8 @@ class TradingView(tkinter.Frame):
 
     def insert_benefice_in_list(self, benefice: float, date: str):
         self.__list_benefice.insert(0, f"{date}: Benefice is {benefice}")
+
+    def update_stock_history(self, stock_index: str, start_date: str, end_date: str):
+        self.stock_index_value['text'] = stock_index
+        self.stock_start_date_value['text'] = start_date
+        self.stock_end_date_value['text'] = end_date

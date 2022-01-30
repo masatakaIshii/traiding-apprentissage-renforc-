@@ -3,6 +3,7 @@ from tokenize import String
 from typing import Optional
 
 import pandas as pd
+from pandas import DataFrame
 
 from logic.Stock import Stock
 import yfinance as yf
@@ -11,6 +12,7 @@ from datetime import datetime
 
 # Doit pendre en paramètre le nombre de catégorie qu'on veut
 class FinanceService:
+    stock_name: str
     start_date: str
     end_date: str
 
@@ -26,6 +28,7 @@ class FinanceService:
 
     # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
+        self.stock_name = stock_name
         self.start_date = start_date
 
         self.end_date = end_date
@@ -80,8 +83,12 @@ class FinanceService:
     def stock_history(self):
         return self.__stock_history
 
-    def set_stock_history(self, new_stock_history):
+    def set_stock_history(self, new_stock_history: DataFrame, stock_name: str = 'Default'):
         self.__stock_history = new_stock_history
+        date_indexes = new_stock_history.index
+        self.start_date = date_indexes[0]
+        self.end_date = date_indexes[len(date_indexes) - 1]
+        self.stock_name = stock_name
 
     @property
     def current_interval(self):

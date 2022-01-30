@@ -16,6 +16,8 @@ class ProcessBot:
 
     def set_controller(self, controller: TradingController):
         self.__controller = controller
+        self.__controller.update_stock_history_info(self.finance_service.stock_name, self.finance_service.start_date,
+                                                    self.finance_service.end_date)
 
     def reset(self):
         self.agent.init_qtable()

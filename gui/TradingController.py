@@ -74,6 +74,9 @@ class TradingController:
         # TODO : pas sûr
         self.__view.set_cur_stock_amount(round(stock.purchase_value, 2))
 
+    def update_stock_history_info(self, stock_index: str, start_date: str, end_date: str):
+        self.__view.update_stock_history(stock_index, start_date, end_date)
+
     @property
     def str_actions(self):
         return self.__str_wallet_actions
