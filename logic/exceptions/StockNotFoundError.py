@@ -1,0 +1,2 @@
+class StockNotFoundError(Exception):
+    pass
