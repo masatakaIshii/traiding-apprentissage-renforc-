@@ -34,8 +34,8 @@ class ProcessBot:
         for i in range(self.__iteration):
             self.agent.reset()
             self.__controller.update_wallet()
-            print('Nouvelle itération')
-            print("")
+            # print('Nouvelle itération')
+            # print("")
             if self.__controller.is_stop is True:
                 break
 
@@ -46,7 +46,6 @@ class ProcessBot:
             while self.agent.current_date and self.__controller.is_stop is False:
                 rest_days = self.__interval
                 while rest_days > 0 and self.__controller.is_stop is False:
-                    print("")
                     # time.sleep(0.2)
                     self.__last_date = self.agent.current_date
                     self.agent.current_date = self.finance_service.next_date(
@@ -55,7 +54,6 @@ class ProcessBot:
                         break
                     self.__controller.update_current_date(self.agent.current_date)
                     new_action = self.agent.best_action()
-                    print(f"ACTION : {new_action}")
                     maybe_stock_bought = self.wallet_service.get_stock(0)
                     current_action = self.__proceed_agent_action_and_update_gui(current_action, new_action,
                                                                                 maybe_stock_bought)

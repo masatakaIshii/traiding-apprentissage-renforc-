@@ -91,6 +91,9 @@ class TradingView(tkinter.Frame):
         # Pack TradingView
         self.grid(row=0, column=0, rowspan=10, padx=10, pady=20)
 
+    def reset_list(self):
+        self.__list_benefice.delete(0, tkinter.END)
+
     def start_button_clicked(self):
         self.start_button["state"] = DISABLED
         self.stop_button["state"] = NORMAL

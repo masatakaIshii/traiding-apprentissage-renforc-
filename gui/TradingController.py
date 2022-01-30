@@ -46,7 +46,8 @@ class TradingController:
         self.__view.start_button.unbind("<Button>")
         self.__view.stop_button.bind("<Button>", self.stop)
         self.__is_stop = False
-
+        self.qtable_controller.reset_qtable()
+        self.__view.reset_list()
         self.__process_bot.reset()
         self.update_wallet()
         threading.Thread(target=self.__process_bot.process).start()

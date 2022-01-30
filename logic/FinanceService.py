@@ -54,10 +54,8 @@ class FinanceService:
         return sum / len(self.__current_interval)
 
     def get_state_by_date(self, date: str) -> int:
-        value = self.get_value_by_date(date)  # 3$ avec une moyenne des deux semaines préc. à 2$
-        # print(f"VALUE BY DATE : {value}")
-        variation_percentage = self.get_variation_percentage_with_average(value)  # +50%
-        # print(f"VARIATION PERCENTAGE : {variation_percentage}")
+        value = self.get_value_by_date(date)
+        variation_percentage = self.get_variation_percentage_with_average(value)
         return self.determine_state_by_value(variation_percentage)
 
     def determine_state_by_value(self, value: float) -> int:

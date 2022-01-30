@@ -131,7 +131,6 @@ class Agent:
     def update(self, action: Action, maybe_stock_bought: Stock | None):
         # print(f"ETAT ACTUEL {self.__state}")
         reward = self.calculate_reward(action, stock=maybe_stock_bought)
-        print(f"REWARD : {reward}")
 
         if maybe_stock_bought is None:
             able_to_buy = self.is_able_to_buy()
