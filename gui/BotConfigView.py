@@ -7,18 +7,9 @@ class BotConfigView(tkinter.Frame):
     def __init__(self, master=None):
         super().__init__(master=master)
         # Bot container
-        bot_container = tkinter.LabelFrame(self, text="Bot information", padx=10, pady=10)
+        bot_container = tkinter.LabelFrame(self, text="Bot configuration", padx=10, pady=5)
 
-        # Count bot iteration
-        count_bot_container = tkinter.LabelFrame(bot_container, padx=10, pady=10)
-        iteration_bot_label = tkinter.Label(count_bot_container, text="Iteration :")
-        iteration_bot_label.grid(row=0, column=0)
-        self.__iteration_bot_value = tkinter.Label(count_bot_container, text="Not yet")
-        self.__iteration_bot_value.grid(row=0, column=1)
-
-        count_bot_container.grid(row=0)
-
-        action_container = tkinter.LabelFrame(bot_container, text="Actions", padx=10, pady=10)
+        action_container = tkinter.LabelFrame(bot_container, text="Actions", padx=10, pady=5)
         self.__action_buy = tkinter.Label(action_container, text="BUY", fg="#0f0", bg="#fff")
         self.__action_buy.grid(row=0, column=0, padx=10, pady=5)
 
@@ -28,14 +19,40 @@ class BotConfigView(tkinter.Frame):
         self.__action_sell = tkinter.Label(action_container, text="SELL", fg="#00f", bg="#fff")
         self.__action_sell.grid(row=0, column=2, padx=10, pady=5)
 
-        action_container.grid(row=1, column=0)
+        action_container.grid(row=0, column=0, pady=5)
 
-        bot_container.pack(pady=10)
+        # bot configuration
+        bot_configuration_container = tkinter.LabelFrame(bot_container, padx=10, pady=10)
 
-        self.grid(row=0, column=1, padx=10, pady=5)
+        # interval
+        interval_label = tkinter.Label(bot_configuration_container, text="Interval :")
+        interval_label.grid(row=0, column=0)
+        self.interval_value = tkinter.Label(bot_configuration_container, text="Not yet")
+        self.interval_value.grid(row=0, column=1)
 
-    def set_count_bot_iter(self, count: int):
-        self.__iteration_bot_value["text"] = str(count)
+        # number categories
+        nb_categories_label = tkinter.Label(bot_configuration_container, text="Number categories :")
+        nb_categories_label.grid(row=1, column=0)
+        self.nb_categories_value = tkinter.Label(bot_configuration_container, text="Not yet")
+        self.nb_categories_value.grid(row=1, column=1)
+
+        # learning rate
+        learning_rate_label = tkinter.Label(bot_configuration_container, text="Learning rate :")
+        learning_rate_label.grid(row=2, column=0)
+        self.learning_rate_value = tkinter.Label(bot_configuration_container, text="Not yet")
+        self.learning_rate_value.grid(row=2, column=1)
+
+        # discount factor
+        discount_factor_label = tkinter.Label(bot_configuration_container, text="Discount factor :")
+        discount_factor_label.grid(row=3, column=0)
+        self.discount_factor_value = tkinter.Label(bot_configuration_container, text="Not yet")
+        self.discount_factor_value.grid(row=3, column=1)
+
+        bot_configuration_container.grid(row=1)
+
+        bot_container.pack(pady=5)
+
+        self.grid(row=0, column=4, rowspan=2, padx=10, pady=5)
 
     def update_action_labels_depend_to_action(self, action):
         self.__reset_action_labels()

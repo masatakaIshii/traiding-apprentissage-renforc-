@@ -61,7 +61,6 @@ class TradingController:
         self.__view.stop_button_clicked()
         self.__view.stop_button.unbind("<Button>")
         self.__view.start_button.bind("<Button>", self.start)
-        print("controller stop")
         self.__is_stop = True
 
     def update_wallet(self):
@@ -96,7 +95,6 @@ class TradingController:
             return
 
         end_date = self.stock_form_controller.get_end_date()
-        print(end_date)
         if end_date == 'Not yet':
             self.stock_form_controller.popup_output_validation("End date not selected", True)
             return

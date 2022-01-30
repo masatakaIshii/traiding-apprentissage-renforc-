@@ -76,7 +76,7 @@ class TradingView(tkinter.Frame):
         self.__current_stock_amount = tkinter.Label(stock_infos_container, text="Not current stock")
         self.__current_stock_amount.grid(row=1, column=1)
 
-        stock_infos_container.grid(row=2, column=0, columnspan=2, pady=5)
+        stock_infos_container.grid(row=2, column=0, columnspan=2, pady=10)
 
         wallet_stocks_container.pack()
 
@@ -86,10 +86,10 @@ class TradingView(tkinter.Frame):
         self.__list_benefice = tkinter.Listbox(historic_container, width=30)
         self.__list_benefice.pack()
 
-        historic_container.pack()
+        historic_container.pack(pady=10)
 
         # Pack TradingView
-        self.grid(row=0, column=0, rowspan=10, padx=10, pady=10)
+        self.grid(row=0, column=0, rowspan=10, padx=10, pady=20)
 
     def start_button_clicked(self):
         self.start_button["state"] = DISABLED
