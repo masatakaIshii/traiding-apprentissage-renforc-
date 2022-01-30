@@ -2,13 +2,14 @@ import threading
 from datetime import datetime, timedelta, date
 
 from gui import StockFormView
+from process import ProcessBot
 
 
 class StockFormController:
-    def __init__(self, view: StockFormView, interval: int = 14):
+    def __init__(self, view: StockFormView, process_bot: ProcessBot):
         self.view = view
         self.__selected_date = ""
-        self.interval = interval
+        self.process_bot = process_bot
 
         self.__is_start_date = True
         self.__is_calendar_open = False
@@ -37,13 +38,13 @@ class StockFormController:
             self.view.get_start_date_button['text'] = 'Reset'
             self.view.get_start_date_button.bind("<Button>", self.__reset_start_and_end_date)
             start_date = datetime.strptime(new_date, '%Y-%m-%d')
-            self.view.calendar['mindate'] = start_date + timedelta(days=1 + self.interval)
+            self.view.calendar['mindate'] = start_date + timedelta(days=1 + self.process_bot.get_interval())
         else:
             self.view.update_end_date(new_date)
             self.view.get_end_date_button['text'] = 'Reset'
             self.view.get_end_date_button.bind("<Button>", self.__reset_start_and_end_date)
             end_date = datetime.strptime(new_date, '%Y-%m-%d')
-            self.view.calendar['maxdate'] = end_date - timedelta(days=1 + self.interval)
+            self.view.calendar['maxdate'] = end_date - timedelta(days=1 + self.process_bot.get_interval())
 
         self.__is_calendar_open = False
         self.view.hide_calendar()

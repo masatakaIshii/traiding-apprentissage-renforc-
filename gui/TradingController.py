@@ -5,7 +5,7 @@ from typing import List
 
 from bot import Agent
 from bot.Action import Action
-from gui import TradingView, QTableController, StockFormController
+from gui import TradingView, QTableController, StockFormController, BotConfigController
 from logic import Stock
 from process import ProcessBot
 
@@ -15,6 +15,7 @@ class TradingController:
                  view: TradingView,
                  qtable_controller: QTableController,
                  stock_form_controller: StockFormController,
+                 bot_config_controller: BotConfigController,
                  process_bot: ProcessBot):
         self.__process_bot = process_bot
         self.__wallet_service = process_bot.wallet_service
@@ -22,14 +23,18 @@ class TradingController:
         self.__agent: Agent = process_bot.agent
         self.qtable_controller = qtable_controller
         self.stock_form_controller = stock_form_controller
+        self.bot_config_controller = bot_config_controller
 
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
         self.__str_wallet_actions: List[string] = []
+
+        # stock form
         self.__view.start_button.bind("<Button>", self.start)
         self.__view.set_wallet_amount(self.__wallet_service.get_amount())
         self.__view.set_current_date(self.__current_date)
-
         self.stock_form_controller.view.validate_button.bind("<Button>", self.fetch_new_stock)
+
+        # bot config
 
         self.__old_wallet_amount = self.__wallet_service.get_amount()
 
@@ -49,9 +54,6 @@ class TradingController:
     def update_current_date(self, new_date: str):
         self.__view.set_current_date(new_date)
 
-    def update_action(self, action: Action):
-        self.__view.update_action_labels_depend_to_action(action=action)
-
     def add_new_benefice(self, benefice: float, current_date: str):
         self.__view.insert_benefice_in_list(benefice=benefice, date=current_date)
 
@@ -59,12 +61,14 @@ class TradingController:
         self.__view.stop_button_clicked()
         self.__view.stop_button.unbind("<Button>")
         self.__view.start_button.bind("<Button>", self.start)
-        print("controller stop")
         self.__is_stop = True
 
     def update_wallet(self):
         wallet_amount = round(self.__wallet_service.get_amount(), 2)
         self.__view.set_wallet_amount(wallet_amount)
+
+    def update_action(self, action: Action):
+        self.bot_config_controller.update_action(action=action)
 
     def update_wallet_and_stock(self, stock: Stock):
         your_stock = self.__wallet_service.get_stock(0)
@@ -91,7 +95,6 @@ class TradingController:
             return
 
         end_date = self.stock_form_controller.get_end_date()
-        print(end_date)
         if end_date == 'Not yet':
             self.stock_form_controller.popup_output_validation("End date not selected", True)
             return
