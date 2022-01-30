@@ -39,7 +39,8 @@ class ProcessBot:
             if self.__controller.is_stop is True:
                 break
 
-            self.finance_service.define_current_interval(start_date=self.finance_service.start_date + " 00:00:00", days=self.__interval)
+            self.finance_service.define_current_interval(start_date=self.finance_service.start_date + " 00:00:00",
+                                                         days=self.__interval)
             self.agent.current_date = str(self.finance_service.current_interval.last_valid_index())
 
             while self.agent.current_date and self.__controller.is_stop is False:

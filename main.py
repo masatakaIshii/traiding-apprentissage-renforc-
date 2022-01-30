@@ -52,7 +52,7 @@ if __name__ == '__main__':
     agent = Agent(wallet_service)
     print(finance_service.stock_history)
 
-    process_bot = ProcessBot(finance_service, wallet_service, agent, "2018-12-31")
+    process_bot = ProcessBot(finance_service, wallet_service, agent)
 
     root = tkinter.Tk()
     w, h = root.winfo_screenwidth(), root.winfo_screenheight()
