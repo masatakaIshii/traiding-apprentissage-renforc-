@@ -20,6 +20,25 @@ class TradingView(tkinter.Frame):
         # Wallet and Stock Container
         wallet_stocks_container = tkinter.LabelFrame(self, text="Wallet and stock information", padx=10, pady=10)
 
+        # stock history container
+
+        stock_history_container = tkinter.LabelFrame(wallet_stocks_container, text="Stock history information", pady=10,
+                                                     padx=10)
+
+        stock_index_label = tkinter.Label(stock_history_container, text="Stock index :")
+        stock_index_label.grid(row=0, column=0)
+
+        self.stock_index_value = tkinter.Label(stock_history_container, text="Default")
+        self.stock_index_value.grid(row=0, column=1)
+
+        self.stock_box = tkinter.Entry(stock_history_container)
+        self.stock_box.grid(row=1, column=0, padx=10)
+
+        self.stock_load_button = tkinter.Button(stock_history_container, text="Load new index")
+        self.stock_load_button.grid(row=1, column=1)
+
+        stock_history_container.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
         # Wallet container
         wallet_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
 
@@ -28,7 +47,7 @@ class TradingView(tkinter.Frame):
         self.__wallet_amount = tkinter.Label(wallet_container, text="Not yet")
         self.__wallet_amount.grid(row=0, column=1)
 
-        wallet_container.grid(row=0, column=0, pady=5, padx=5)
+        wallet_container.grid(row=1, column=0, pady=5, padx=5)
 
         # Date container
         date_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
@@ -38,7 +57,7 @@ class TradingView(tkinter.Frame):
         self.__date_content = tkinter.Label(date_container, text="Not yet")
         self.__date_content.grid(row=0, column=1)
 
-        date_container.grid(row=0, column=1, pady=5, padx=5)
+        date_container.grid(row=1, column=1, pady=5, padx=5)
 
         # Stock information
         stock_infos_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
@@ -53,7 +72,7 @@ class TradingView(tkinter.Frame):
         self.__current_stock_amount = tkinter.Label(stock_infos_container, text="Not current stock")
         self.__current_stock_amount.grid(row=1, column=1)
 
-        stock_infos_container.grid(row=1, column=0, columnspan=2, pady=5)
+        stock_infos_container.grid(row=2, column=0, columnspan=2, pady=5)
 
         wallet_stocks_container.pack()
 

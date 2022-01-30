@@ -1,10 +1,8 @@
 import string
 import threading
-from tkinter import Tk
 from typing import List
 
 from bot.Action import Action
-from bot.Agent import Agent
 from gui import TradingView, QTableController
 from logic import Stock
 from process import ProcessBot

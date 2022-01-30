@@ -58,6 +58,7 @@ class ProcessBot:
         self.__controller.qtable_controller.reset_qtable()
         self.__controller.qtable_controller.update_qtable(self.agent.qtable)
         self.__controller.stop(())
+        self.pretty(self.agent.qtable)
 
     def __proceed_agent_action_and_update_gui(self, current_action: Action, new_action: Action,
                                               maybe_stock_bought: Stock | None):
