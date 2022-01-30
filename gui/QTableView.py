@@ -29,7 +29,7 @@ class QTableView(tkinter.Frame):
         self.count = 0
         self.table.pack(pady=20, expand=True, fill='y')
 
-        self.grid(row=1, column=1, rowspan=7, padx=10, pady=10, sticky="ns")
+        self.grid(row=1, column=1, rowspan=10, columnspan=2, padx=10, pady=10, sticky="ns")
 
     def build_qtable(self, qtable: dict, parent_id: int | None):
         concerned_parent_id = '' if parent_id is None else parent_id

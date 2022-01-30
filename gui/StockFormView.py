@@ -51,7 +51,7 @@ class StockFormView(tkinter.Frame):
 
         fetch_stock_container.pack()
 
-        self.grid(row=0, column=1, columnspan=3, padx=10, pady=5)
+        self.grid(row=0, column=2, columnspan=3, padx=10, pady=5)
 
         # self.calender_container.grid_remove()
 

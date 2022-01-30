@@ -14,6 +14,7 @@ class ProcessBot:
         self.__last_date = start_date
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
+        self.__interval = 14
 
     def set_controller(self, controller: TradingController):
         self.__controller = controller
@@ -24,7 +25,7 @@ class ProcessBot:
         self.agent.init_qtable()
         self.agent.reset()
 
-    def process(self, days: int = 14):
+    def process(self):
         if self.__controller is None:
             print("PROBLEM controller not initialize in ProcessBot")
             return
@@ -38,11 +39,11 @@ class ProcessBot:
             if self.__controller.is_stop is True:
                 break
 
-            self.finance_service.define_current_interval(start_date=self.__start_date, days=days)
+            self.finance_service.define_current_interval(start_date=self.__start_date, days=self.__interval)
             self.agent.current_date = str(self.finance_service.current_interval.last_valid_index())
 
             while self.agent.current_date and self.__controller.is_stop is False:
-                rest_days = days
+                rest_days = self.__interval
                 while rest_days > 0 and self.__controller.is_stop is False:
                     print("")
                     # time.sleep(0.2)
@@ -59,7 +60,7 @@ class ProcessBot:
                                                                                 maybe_stock_bought)
                     rest_days = rest_days - 1
                 self.finance_service.define_current_interval(
-                    str(self.finance_service.current_interval.last_valid_index()), days)
+                    str(self.finance_service.current_interval.last_valid_index()), self.__interval)
 
             self.agent.sell_all_for_the_end(self.__last_date)
             self.__last_date = self.agent.current_date
@@ -94,6 +95,12 @@ class ProcessBot:
             self.__controller.update_action(new_action)
             return new_action
         return current_action
+
+    def get_interval(self):
+        return self.__interval
+
+    def set_interval(self, new_interval: int):
+        self.__interval = new_interval
 
     def pretty(self, d, indent=0):
         for key, value in d.items():
