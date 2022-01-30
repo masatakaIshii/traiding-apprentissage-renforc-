@@ -5,13 +5,12 @@ from logic import FinanceService, WalletService, Stock
 
 class ProcessBot:
     def __init__(self, finance_service: FinanceService, wallet_service: WalletService,
-                 agent: Agent, start_date: str):
+                 agent: Agent):
         self.__controller: TradingController | None = None
         self.finance_service = finance_service
         self.wallet_service: WalletService = wallet_service
         self.agent: Agent = agent
-        self.__start_date = start_date
-        self.__last_date = start_date
+        self.__last_date = self.finance_service.start_date
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
 
@@ -38,7 +37,7 @@ class ProcessBot:
             if self.__controller.is_stop is True:
                 break
 
-            self.finance_service.define_current_interval(start_date=self.__start_date, days=days)
+            self.finance_service.define_current_interval(start_date=self.finance_service.start_date + " 00:00:00", days=days)
             self.agent.current_date = str(self.finance_service.current_interval.last_valid_index())
 
             while self.agent.current_date and self.__controller.is_stop is False:

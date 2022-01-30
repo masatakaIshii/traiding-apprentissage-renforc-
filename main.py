@@ -2,7 +2,7 @@ from datetime import datetime
 
 from bot.Action import Action
 from bot.Agent import Agent
-from gui import QTableView, QTableController
+from gui import QTableView, QTableController, StockFormView, StockFormController
 from logic.FinanceService import FinanceService
 from logic.Wallet import Wallet
 from logic.service.WalletService import WalletService
@@ -55,16 +55,21 @@ if __name__ == '__main__':
 
     interval = 14
 
-    process_bot = ProcessBot(finance_service, wallet_service, agent, "2019-07-01 00:00:00")
+    process_bot = ProcessBot(finance_service, wallet_service, agent)
 
     root = tkinter.Tk()
 
     qtable_view = QTableView(master=root)
     qtable_controller = QTableController(view=qtable_view)
 
+    w, h = root.winfo_screenwidth(), root.winfo_screenheight()
+    root.geometry("%dx%d+0+0" % (w, h))
+    stock_form_view = StockFormView(master=root)
+    stock_form_controller = StockFormController(view=stock_form_view)
+
     trading_view = TradingView(master=root)
     trading_controller = TradingController(view=trading_view, qtable_controller=qtable_controller,
-                                           process_bot=process_bot)
+                                           process_bot=process_bot, stock_form_controller=stock_form_controller)
 
     root.title("Trading bot")
     root.mainloop()
