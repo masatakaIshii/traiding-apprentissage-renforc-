@@ -17,7 +17,7 @@ class Agent:
         self.__actions = [Action.BUY, Action.KEEP, Action.SELL]
         self.__wallet_service = wallet_service
         self.__learning_rate = learning_rate
-        self.__discount_factor = discount_factor
+        self.__discount_factor: float = discount_factor
         self.__qtable = {}
         self.__did_forbidden_action = False
         self.init_qtable()
@@ -62,6 +62,22 @@ class Agent:
     @property
     def wallet_service(self) -> WalletService:
         return self.__wallet_service
+
+    @property
+    def learning_rate(self) -> float:
+        return self.__learning_rate
+
+    @learning_rate.setter
+    def learning_rate(self, learning_rate: float):
+        self.__learning_rate = learning_rate
+
+    @property
+    def discount_factor(self) -> float:
+        return self.__discount_factor
+
+    @discount_factor.setter
+    def discount_factor(self, discount_factor: float):
+        self.__discount_factor = discount_factor
 
     # @property
     # def wallet_service(self) -> WalletService:

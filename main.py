@@ -64,7 +64,7 @@ if __name__ == '__main__':
     qtable_controller = QTableController(view=qtable_view)
 
     bot_config_view = BotConfigView(master=root)
-    bot_config_controller = BotConfigController(view=bot_config_view)
+    bot_config_controller = BotConfigController(view=bot_config_view, process_bot=process_bot)
 
     trading_view = TradingView(master=root)
     trading_controller = TradingController(

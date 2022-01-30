@@ -118,3 +118,7 @@ class FinanceService:
 
     def get_first_date_of_stock_history(self) -> str:
         return self.__stock_history.index[0]
+
+    @category_number.setter
+    def category_number(self, value: int):
+        self.__category_number = value

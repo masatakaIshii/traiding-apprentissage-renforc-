@@ -15,6 +15,7 @@ class ProcessBot:
 
         self.__old_wallet_amount = self.wallet_service.get_amount()
         self.__interval = 14
+        self.__iteration = 10
 
     def set_controller(self, controller: TradingController):
         self.__controller = controller
@@ -31,7 +32,7 @@ class ProcessBot:
             return
 
         current_action = Action.BUY
-        for i in range(10):
+        for i in range(self.__iteration):
             self.agent.reset()
             self.__controller.update_wallet()
             print('Nouvelle itération')
@@ -101,6 +102,14 @@ class ProcessBot:
 
     def set_interval(self, new_interval: int):
         self.__interval = new_interval
+
+    @property
+    def iteration(self) -> int:
+        return self.__iteration
+
+    @iteration.setter
+    def iteration(self, iteration: int):
+        self.__iteration = iteration
 
     def pretty(self, d, indent=0):
         for key, value in d.items():
