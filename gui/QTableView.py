@@ -21,7 +21,7 @@ class QTableView(tkinter.Frame):
         self.table.column("Action.SELL", anchor=CENTER, width=120)
 
         # Heading
-        self.table.heading("#0", text="Node info", anchor=W)
+        self.table.heading("#0", text="Nodes info", anchor=W)
         self.table.heading("Action.BUY", text="Action BUY", anchor=W)
         self.table.heading("Action.KEEP", text="Action KEEP", anchor=W)
         self.table.heading("Action.SELL", text="Action SELL", anchor=W)

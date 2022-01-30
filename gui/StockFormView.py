@@ -1,3 +1,4 @@
+import time
 import tkinter
 
 from tkcalendar import Calendar
@@ -34,6 +35,8 @@ class StockFormView(tkinter.Frame):
         self.validate_button = tkinter.Button(stock_form_container, text="Validate")
         self.validate_button.grid(row=3, columnspan=3, pady=10)
 
+        self.output_validation = tkinter.Label(stock_form_container)
+
         stock_form_container.grid(row=0, column=0)
 
         self.calender_container = tkinter.LabelFrame(fetch_stock_container)
@@ -41,9 +44,9 @@ class StockFormView(tkinter.Frame):
         self.calender_title = tkinter.Label(self.calender_container, text="Calender title")
         self.calender_title.grid(row=0, column=1)
 
-        self.calender = Calendar(self.calender_container, selectmode="day", year=2020, month=5, day=22,
+        self.calendar = Calendar(self.calender_container, selectmode="day", year=2020, month=5, day=22,
                                  date_pattern='y-mm-dd')
-        self.calender.grid(row=1, column=1, pady=5, padx=20)
+        self.calendar.grid(row=1, column=1, pady=5, padx=20)
         # self.calender_container.grid(row=0, column=1)
 
         fetch_stock_container.pack()
@@ -55,7 +58,7 @@ class StockFormView(tkinter.Frame):
     def show_calender(self):
         self.calender_container.grid(row=0, column=1)
 
-    def hide_calender(self):
+    def hide_calendar(self):
         self.calender_container.grid_remove()
 
     def update_start_date(self, start_date: str):
@@ -63,3 +66,9 @@ class StockFormView(tkinter.Frame):
 
     def update_end_date(self, end_date: str):
         self.end_date_value['text'] = end_date
+
+    def popup_output_validation(self):
+        self.output_validation.grid(row=4, columnspan=3, pady=10)
+        time.sleep(3)
+        self.output_validation.grid_remove()
+        self.output_validation['text'] = ''

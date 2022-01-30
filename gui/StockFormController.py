@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+import threading
+from datetime import datetime, timedelta, date
 
 from gui import StockFormView
 
@@ -6,40 +7,75 @@ from gui import StockFormView
 class StockFormController:
     def __init__(self, view: StockFormView, interval: int = 14):
         self.view = view
-        self.selected_date = ""
-        self.view.validate_button.bind("<Button>", self.validate_date)
+        self.__selected_date = ""
         self.interval = interval
 
         self.__is_start_date = True
+        self.__is_calendar_open = False
+
         self.view.get_start_date_button.bind("<Button>", self.open_calendar_for_start_date)
         self.view.get_end_date_button.bind("<Button>", self.open_calendar_for_end_date)
 
-        self.view.calender.bind("<<CalendarSelected>>", self.__date_selected)
+        yesterday = date.today() - timedelta(days=1)
+        self.view.calendar['maxdate'] = yesterday
+        self.view.calendar.bind("<<CalendarSelected>>", self.__date_selected)
 
     def open_calendar_for_start_date(self, _):
-        print("open calender for start date")
         self.__is_start_date = True
-        if self.view.end_date_value['text'] != 'Not yet':
-            start_date = datetime.strptime(self.view.end_date_value['text'], '%Y-%m-%d')
-            self.view.calender['maxdate'] = start_date - timedelta(days=1 + self.interval)
+        self.__is_calendar_open = True
         self.view.show_calender()
 
     def open_calendar_for_end_date(self, _):
         self.__is_start_date = False
-        if self.view.start_date_value['text'] != 'Not yet':
-            start_date = datetime.strptime(self.view.start_date_value['text'], '%Y-%m-%d')
-            self.view.calender['mindate'] = start_date + timedelta(days=1 + self.interval)
+        self.__is_calendar_open = True
         self.view.show_calender()
 
-    def validate_date(self, _):
-        self.selected_date = self.view.calender.get_date()
-        print(f"selection date : {self.selected_date}")
-
     def __date_selected(self, _):
-        print(f"date selected : {self.view.calender.get_date()}")
-        new_date = self.view.calender.get_date()
+        new_date = self.view.calendar.get_date()
         if self.__is_start_date:
             self.view.update_start_date(new_date)
+            self.view.get_start_date_button['text'] = 'Reset'
+            self.view.get_start_date_button.bind("<Button>", self.__reset_start_and_end_date)
+            start_date = datetime.strptime(new_date, '%Y-%m-%d')
+            self.view.calendar['mindate'] = start_date + timedelta(days=1 + self.interval)
         else:
             self.view.update_end_date(new_date)
-        self.view.hide_calender()
+            self.view.get_end_date_button['text'] = 'Reset'
+            self.view.get_end_date_button.bind("<Button>", self.__reset_start_and_end_date)
+            end_date = datetime.strptime(new_date, '%Y-%m-%d')
+            self.view.calendar['maxdate'] = end_date - timedelta(days=1 + self.interval)
+
+        self.__is_calendar_open = False
+        self.view.hide_calendar()
+
+    def reset_form(self):
+        self.view.stock_name_value.delete(0, 'end')
+        yesterday = date.today() - timedelta(days=1)
+        self.view.calendar['maxdate'] = yesterday
+        self.__reset_start_and_end_date({})
+
+    def __reset_start_and_end_date(self, _):
+        if self.__is_calendar_open is True:
+            self.view.hide_calendar()
+        self.view.start_date_value['text'] = 'Not yet'
+        self.view.get_start_date_button['text'] = 'Get date'
+        self.view.get_start_date_button.bind("<Button>", self.open_calendar_for_start_date)
+        self.view.calendar['mindate'] = None
+
+        self.view.end_date_value['text'] = 'Not yet'
+        self.view.get_end_date_button['text'] = 'Get date'
+        self.view.get_end_date_button.bind("<Button>", self.open_calendar_for_end_date)
+        self.view.calendar['maxdate'] = None
+
+    def popup_output_validation(self, output: str, is_error: bool):
+        self.view.output_validation['text'] = output
+        threading.Thread(target=self.view.popup_output_validation).start()
+
+    def get_stock_name(self):
+        return self.view.stock_name_value.get()
+
+    def get_start_date(self):
+        return self.view.start_date_value['text']
+
+    def get_end_date(self):
+        return self.view.end_date_value['text']
