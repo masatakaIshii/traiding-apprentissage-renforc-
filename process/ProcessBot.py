@@ -17,6 +17,8 @@ class ProcessBot:
 
     def set_controller(self, controller: TradingController):
         self.__controller = controller
+        self.__controller.update_stock_history_info(self.finance_service.stock_name, self.finance_service.start_date,
+                                                    self.finance_service.end_date)
 
     def reset(self):
         self.agent.init_qtable()
@@ -66,6 +68,7 @@ class ProcessBot:
         self.__controller.qtable_controller.reset_qtable()
         self.__controller.qtable_controller.update_qtable(self.agent.qtable)
         self.__controller.stop(())
+        self.pretty(self.agent.qtable)
 
     def __proceed_agent_action_and_update_gui(self, current_action: Action, new_action: Action,
                                               maybe_stock_bought: Stock | None):

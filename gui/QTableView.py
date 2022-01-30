@@ -21,7 +21,7 @@ class QTableView(tkinter.Frame):
         self.table.column("Action.SELL", anchor=CENTER, width=120)
 
         # Heading
-        self.table.heading("#0", text="Label", anchor=W)
+        self.table.heading("#0", text="Nodes info", anchor=W)
         self.table.heading("Action.BUY", text="Action BUY", anchor=W)
         self.table.heading("Action.KEEP", text="Action KEEP", anchor=W)
         self.table.heading("Action.SELL", text="Action SELL", anchor=W)
@@ -29,7 +29,7 @@ class QTableView(tkinter.Frame):
         self.count = 0
         self.table.pack(pady=20, expand=True, fill='y')
 
-        self.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
+        self.grid(row=1, column=1, rowspan=7, padx=10, pady=10, sticky="ns")
 
     def build_qtable(self, qtable: dict, parent_id: int | None):
         concerned_parent_id = '' if parent_id is None else parent_id
