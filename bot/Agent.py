@@ -11,6 +11,7 @@ class Agent:
         self.__wallet_service = wallet_service
         self.__learning_rate = learning_rate
         self.__discount_factor: float = discount_factor
+        self.__able_to_buy = True
         self.__qtable = {}
         self.__did_forbidden_action = False
         self.init_qtable()
@@ -116,7 +117,7 @@ class Agent:
         reward = self.calculate_reward(action, stock=maybe_stock_bought)
 
         if maybe_stock_bought is None:
-            able_to_buy = self.is_able_to_buy()
+            able_to_buy = self.__able_to_buy
             maxQ = max(self.__qtable[self.__state][False][able_to_buy].values())
             self.__qtable[self.__state][False][able_to_buy][action] += round(self.__learning_rate * \
                                                                              (reward + self.__discount_factor * maxQ -
@@ -169,6 +170,7 @@ class Agent:
     def do_action(self, action: Action):
 
         self.__did_forbidden_action = False
+        self.__able_to_buy = self.is_able_to_buy()
         match action:
             case Action.BUY:
                 if self.__wallet_service.contains_stock():
