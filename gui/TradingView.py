@@ -1,14 +1,11 @@
 import tkinter
 from tkinter import DISABLED, NORMAL
 
-from bot.Action import Action
-
 
 class TradingView(tkinter.Frame):
     def __init__(self, master=None):
         super().__init__(master=master)
 
-        # Buttons
         buttons_container = tkinter.LabelFrame(self, padx=10, pady=10)
         self.start_button = tkinter.Button(buttons_container, text="Start")
         self.start_button.grid(row=0, column=0, padx=5, pady=5)
@@ -17,10 +14,7 @@ class TradingView(tkinter.Frame):
         self.stop_button.grid(row=0, column=2, padx=5, pady=5)
         buttons_container.pack(pady=10)
 
-        # Wallet and Stock Container
         wallet_stocks_container = tkinter.LabelFrame(self, text="Wallet and stock information", padx=10, pady=10)
-
-        # stock history container
 
         stock_history_container = tkinter.LabelFrame(wallet_stocks_container, text="Stock history information", pady=10,
                                                      padx=10)
@@ -43,7 +37,6 @@ class TradingView(tkinter.Frame):
 
         stock_history_container.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
-        # Wallet container
         wallet_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
 
         wallet_label = tkinter.Label(wallet_container, text="Wallet content :")
@@ -53,7 +46,6 @@ class TradingView(tkinter.Frame):
 
         wallet_container.grid(row=1, column=0, pady=5, padx=5)
 
-        # Date container
         date_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
 
         date_label = tkinter.Label(date_container, text="Current date : ")
@@ -63,7 +55,6 @@ class TradingView(tkinter.Frame):
 
         date_container.grid(row=1, column=1, pady=5, padx=5)
 
-        # Stock information
         stock_infos_container = tkinter.LabelFrame(wallet_stocks_container, padx=10, pady=10)
 
         your_stock_label = tkinter.Label(stock_infos_container, text="Your stock value :")
@@ -80,7 +71,6 @@ class TradingView(tkinter.Frame):
 
         wallet_stocks_container.pack()
 
-        # Historic
         historic_container = tkinter.LabelFrame(self, text=" Benefice Historic", padx=10, pady=10)
 
         self.__list_benefice = tkinter.Listbox(historic_container, width=30)
@@ -88,7 +78,6 @@ class TradingView(tkinter.Frame):
 
         historic_container.pack(pady=10)
 
-        # Pack TradingView
         self.grid(row=0, column=0, rowspan=10, padx=10, pady=20)
 
     def reset_list(self):

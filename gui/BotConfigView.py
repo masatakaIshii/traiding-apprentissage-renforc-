@@ -6,7 +6,7 @@ from bot import Action
 class BotConfigView(tkinter.Frame):
     def __init__(self, master=None):
         super().__init__(master=master)
-        # Bot container
+
         bot_container = tkinter.LabelFrame(self, text="Bot configuration", padx=10, pady=5)
 
         action_container = tkinter.LabelFrame(bot_container, text="Actions", padx=10, pady=5)
@@ -21,10 +21,8 @@ class BotConfigView(tkinter.Frame):
 
         action_container.grid(row=0, column=0, pady=5)
 
-        # bot configuration
         bot_configuration_container = tkinter.LabelFrame(bot_container, padx=10, pady=10)
 
-        # interval
         interval_label = tkinter.Label(bot_configuration_container, text="Interval :")
         interval_label.grid(row=0, column=0)
         self.interval_value = tkinter.Label(bot_configuration_container, text="Not yet")
@@ -34,7 +32,6 @@ class BotConfigView(tkinter.Frame):
         self.interval_save_btn = tkinter.Button(bot_configuration_container, text="Save")
         self.interval_save_btn.grid(row=0, column=3)
 
-        # number categories
         nb_categories_label = tkinter.Label(bot_configuration_container, text="Number categories :")
         nb_categories_label.grid(row=1, column=0)
         self.nb_categories_value = tkinter.Label(bot_configuration_container, text="Not yet")
@@ -44,7 +41,6 @@ class BotConfigView(tkinter.Frame):
         self.nb_categories_save_btn = tkinter.Button(bot_configuration_container, text="Save")
         self.nb_categories_save_btn.grid(row=1, column=3)
 
-        # learning rate
         learning_rate_label = tkinter.Label(bot_configuration_container, text="Learning rate :")
         learning_rate_label.grid(row=2, column=0)
         self.learning_rate_value = tkinter.Label(bot_configuration_container, text="Not yet")
@@ -54,7 +50,6 @@ class BotConfigView(tkinter.Frame):
         self.learning_rate_save_btn = tkinter.Button(bot_configuration_container, text="Save")
         self.learning_rate_save_btn.grid(row=2, column=3)
 
-        # discount factor
         discount_factor_label = tkinter.Label(bot_configuration_container, text="Discount factor :")
         discount_factor_label.grid(row=3, column=0)
         self.discount_factor_value = tkinter.Label(bot_configuration_container, text="Not yet")
@@ -64,7 +59,6 @@ class BotConfigView(tkinter.Frame):
         self.discount_factor_save_btn = tkinter.Button(bot_configuration_container, text="Save")
         self.discount_factor_save_btn.grid(row=3, column=3)
 
-        # iteration
         iteration_label = tkinter.Label(bot_configuration_container, text="Iteration :")
         iteration_label.grid(row=4, column=0)
         self.iteration_value = tkinter.Label(bot_configuration_container, text="Not yet")

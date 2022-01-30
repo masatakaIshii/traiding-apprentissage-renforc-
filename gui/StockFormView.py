@@ -10,7 +10,6 @@ class StockFormView(tkinter.Frame):
 
         fetch_stock_container = tkinter.LabelFrame(self, text="Fetch new stock")
 
-        # Stock form
         stock_form_container = tkinter.LabelFrame(fetch_stock_container)
 
         stock_name_label = tkinter.Label(stock_form_container, text="Stock name :")
@@ -47,13 +46,10 @@ class StockFormView(tkinter.Frame):
         self.calendar = Calendar(self.calender_container, selectmode="day", year=2020, month=5, day=22,
                                  date_pattern='y-mm-dd')
         self.calendar.grid(row=1, column=1, pady=5, padx=20)
-        # self.calender_container.grid(row=0, column=1)
 
         fetch_stock_container.pack()
 
         self.grid(row=0, column=1, columnspan=3, padx=10, pady=5)
-
-        # self.calender_container.grid_remove()
 
     def show_calender(self):
         self.calender_container.grid(row=0, column=1)

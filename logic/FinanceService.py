@@ -1,16 +1,14 @@
+from datetime import datetime
 from datetime import timedelta
-from tokenize import String
 from typing import Optional
 
 import pandas as pd
+import yfinance as yf
 from pandas import DataFrame
 
 from logic.Stock import Stock
-import yfinance as yf
-from datetime import datetime
 
 
-# Doit pendre en paramètre le nombre de catégorie qu'on veut
 class FinanceService:
     stock_name: str
     start_date: str
@@ -26,7 +24,6 @@ class FinanceService:
     def average_value(self) -> float:
         return self.__average_value
 
-    # call api so be careful to not use so much (one time maximum)
     def load_history(self, stock_name, start_date, end_date):
         ticker = yf.Ticker(stock_name)
         fetched_history = ticker.history(interval="1d", start=start_date, end=end_date)

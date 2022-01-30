@@ -1,11 +1,11 @@
+import matplotlib.pyplot as plt
+import mplfinance as mpf
 import pandas as pd
 
 from bot import Agent, Action
 from gui import TradingController
 from logic import FinanceService, WalletService, Stock
-import numpy as np
-import matplotlib.pyplot as plt
-import mplfinance as mpf
+
 
 class ProcessBot:
     def __init__(self, finance_service: FinanceService, wallet_service: WalletService,
@@ -40,8 +40,7 @@ class ProcessBot:
         for i in range(self.__iteration):
             self.agent.reset()
             self.__controller.update_wallet()
-            # print('Nouvelle itération')
-            # print("")
+
             if self.__controller.is_stop is True:
                 break
 
@@ -52,10 +51,10 @@ class ProcessBot:
             while self.agent.current_date and self.__controller.is_stop is False:
                 rest_days = self.__interval
                 while rest_days > 0 and self.__controller.is_stop is False:
-                    # time.sleep(0.2)
+
                     self.__last_date = self.agent.current_date
                     self.agent.current_date = self.finance_service.next_date(
-                        self.agent.current_date)  # on est sur la date d'après
+                        self.agent.current_date)
                     if not self.agent.current_date:
                         break
                     self.__controller.update_current_date(self.agent.current_date)

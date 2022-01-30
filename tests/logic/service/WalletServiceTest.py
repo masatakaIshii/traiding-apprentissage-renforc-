@@ -15,14 +15,12 @@ class WalletServiceTest(unittest.TestCase):
         self.wallet = Wallet()
         self.wallet_service = WalletService(self.wallet, self.mock_finance_service)
 
-    # get_amount
     def test_get_amount_should_return_amount_of_wallet(self):
         wallet_amount = 33
         self.wallet.wallet_amount = wallet_amount
 
         self.assertEqual(wallet_amount, self.wallet_service.get_amount())
 
-    # buy_stock
     def test_buy_stock_should_reduce_amount_of_wallet_depend_to_found_stock(self):
         today_str = date.today().strftime('%m-%d-%Y')
         purchase_value = 36
@@ -67,7 +65,6 @@ class WalletServiceTest(unittest.TestCase):
         with self.assertRaises(IncorrectBuyAmountError):
             self.wallet_service.buy_stock(today, share_percentage)
 
-    # get_stocks
     def test_get_stocks_should_return_all_stocks_on_wallet(self):
         self.wallet.stocks = stocks = [
             Stock("20-10-2020", 5, 4)
@@ -77,7 +74,6 @@ class WalletServiceTest(unittest.TestCase):
 
         self.assertEqual(result, stocks)
 
-    # get_stock
     def test_get_stock_should_get_one_stock_based_on_stocks_by_index(self):
         expect_stock = Stock("20-10-2020", 5, 4)
         self.wallet.stocks = [

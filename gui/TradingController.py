@@ -1,6 +1,5 @@
 import string
 import threading
-from tkinter import Tk
 from typing import List
 
 from bot import Agent
@@ -28,13 +27,10 @@ class TradingController:
         self.__current_date = self.__wallet_service.finance_service.get_first_date_of_stock_history()
         self.__str_wallet_actions: List[string] = []
 
-        # stock form
         self.__view.start_button.bind("<Button>", self.start)
         self.__view.set_wallet_amount(self.__wallet_service.get_amount())
         self.__view.set_current_date(self.__current_date)
         self.stock_form_controller.view.validate_button.bind("<Button>", self.fetch_new_stock)
-
-        # bot config
 
         self.__old_wallet_amount = self.__wallet_service.get_amount()
 
@@ -78,7 +74,7 @@ class TradingController:
         else:
             self.__view.set_your_stock_amount(None)
         self.update_wallet()
-        # TODO : pas sûr
+
         self.__view.set_cur_stock_amount(round(stock.purchase_value, 2))
 
     def update_stock_history_info(self, stock_index: str, start_date: str, end_date: str):

@@ -1,7 +1,3 @@
-# Récupérer les infos entre deux dates
-# Sauvegarder le paquetol
-# Faire les calculs au moment de l'achat / vente etc
-from logic.FinanceService import FinanceService
 from logic.Stock import Stock
 from logic.exceptions.IncorrectBuyAmountError import IncorrectBuyAmountError
 
