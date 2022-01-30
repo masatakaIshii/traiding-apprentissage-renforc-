@@ -90,7 +90,7 @@ class FinanceService:
         return self.__current_interval
 
     def define_current_interval(self, start_date: str, days: int):
-        start_date_datetime = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
+        start_date_datetime = datetime.strptime(start_date[0:10], '%Y-%m-%d')
         end_date = start_date_datetime + timedelta(days=days)
         self.__current_interval = self.__stock_history.loc[start_date:str(end_date)]
         self.__average_value = self.get_average_value()
