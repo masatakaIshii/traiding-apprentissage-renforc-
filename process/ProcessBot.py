@@ -1,7 +1,11 @@
+import pandas as pd
+
 from bot import Agent, Action
 from gui import TradingController
 from logic import FinanceService, WalletService, Stock
-
+import numpy as np
+import matplotlib.pyplot as plt
+import mplfinance as mpf
 
 class ProcessBot:
     def __init__(self, finance_service: FinanceService, wallet_service: WalletService,
@@ -26,6 +30,8 @@ class ProcessBot:
         self.agent.reset()
 
     def process(self):
+        d = {'WalletAmount': [], 'Iteration': []}
+
         if self.__controller is None:
             print("PROBLEM controller not initialize in ProcessBot")
             return
@@ -65,10 +71,22 @@ class ProcessBot:
             self.__last_date = self.agent.current_date
             self.__controller.empty_stocks_wallet()
             self.__controller.update_wallet()
+            d['WalletAmount'].append(self.wallet_service.get_amount())
+            d['Iteration'].append(i + 1)
         self.__controller.qtable_controller.reset_qtable()
         self.__controller.qtable_controller.update_qtable(self.agent.qtable)
         self.__controller.stop(())
         self.pretty(self.agent.qtable)
+
+        df = pd.DataFrame(data=d)
+
+        df.plot(y='WalletAmount', x='Iteration')
+        plt.title("Apprentissage du bot")
+        plt.legend()
+
+        mpf.plot(self.finance_service.stock_history, type="candle", volume=True, figratio=(
+            15, 7), style='yahoo', mav=(6, 15), title='spy candle charts')
+        plt.show()
 
     def __proceed_agent_action_and_update_gui(self, current_action: Action, new_action: Action,
                                               maybe_stock_bought: Stock | None):
