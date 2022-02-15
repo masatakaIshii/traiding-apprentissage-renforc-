@@ -47,7 +47,7 @@ class BotConfigController:
         self.__view.learning_rate_value['text'] = f"{round(learning_rate, 2)}"
 
     def update_discount_factor(self, discount_factor: float):
-        self.__view.discount_factor_value['text'] = f"{round(discount_factor)}"
+        self.__view.discount_factor_value['text'] = f"{round(discount_factor, 2)}"
 
     def update_iteration(self, iteration: int):
         self.__view.iteration_value['text'] = f"{iteration}"
