@@ -18,6 +18,7 @@ class Agent:
         self.reset()
 
     def init_qtable(self):
+        self.__qtable = {}
         for state in range(self.__wallet_service.finance_service.category_number):
             self.__qtable[state] = {}
             for stock_state in [False, True]:
